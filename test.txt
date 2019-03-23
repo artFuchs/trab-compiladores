@@ -1,0 +1,11 @@
+int x = I;
+
+if x <= O
+  then y = F;
+  else y = G;
+
+word1 = "manjericao";
+word2 = "pipoca";
+
+char1 = 'a';
+char2 = 'asdasd';
