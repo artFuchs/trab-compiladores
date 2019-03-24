@@ -1,11 +1,30 @@
+ZZ if declara a variavel x tendo o valor 1
 int x = I;
 
-if x <= O
-  then y = F;
-  else y = G;
+if x <= O ZZ se x <= 0
+  then y = F; ZZ então y = 5
+  else y = G; ZZ senão y = 3
+
+XXX
+  aqui declaramos algumas variaveis
+  elas não são importantes, no entanto.
+  Tem uma inclusive que está errada.
+   _____   ______   ______      __      ______
+  |  ___| |  ____| |  ____|    /  \    |  ____|
+  | |___  | |____  | |____    / /\ \   | |____
+  |  ___| |____  | |____  |  / /__\ \  |____  |
+  | |___   ____| |  ____| | |  _____ |  ____| |
+  |_____| |______| |______| |_|    |_| |______|
+  linhas devem ser ignoradas
+XXX
 
 word1 = "manjericao";
 word2 = "pipoca";
 
+phrase1 = word1 + "combina muito com batata e banana";
+phrase2 = "cinema pede por " + word2;
+
 char1 = 'a';
 char2 = 'asdasd';
+
+float z = FEDE.FEDE;

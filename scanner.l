@@ -4,9 +4,17 @@
   int running = 1;
   int lineNumber = 1;
 %}
+%x COMMENT
 
 %%
 \n                                    { printf ("line = %d\n", lineNumber++);}
+
+ZZ.*
+XXX                                   {BEGIN(COMMENT);}
+<COMMENT>\n                           {printf ("line = %d\n", lineNumber++);}
+<COMMENT>XXX                          {BEGIN(0);}
+<COMMENT>.*
+
 "byte"                                { return KW_BYTE; }
 "int"                                 { return KW_INT; }
 "float"                               { return KW_FLOAT; }
@@ -28,9 +36,9 @@
 "not"                                 { return OPERATOR_NOT; }
 [a-z0-9_]+                            { hashInsert(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 [OIHGFEDCBA]+                         { hashInsert(LIT_INTEGER, yytext); return LIT_INTEGER; }
-[OIHGFEDCBA]+.[OIHGFEDCBA]+           { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
+[OIHGFEDCBA]+\.[OIHGFEDCBA]+           { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
 \'.\'                                 { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
-\"[a-zA-Z0-9]*\"                      { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
+\".*\"                      { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
 [ \t]
 .                                     { return TOKEN_ERROR; }
 %%
