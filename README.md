@@ -11,8 +11,8 @@ arquivo tokens.h fornecido ou códigos ascii para caracteres simples;
 símbolos implementada com estrutura hash;
 - [x] controlar o número de linha do arquivo fonte, e fornecer uma função declarada como
 int getLineNumber(void) a ser usada nos testes e pela futura análise sintática;
-- [ ] ignorar comentários de única linha e múltiplas linhas;
-- [ ] informar erro léxico ao encontrar caracteres inválidos na entrada, retornando o token
+- [X] ignorar comentários de única linha e múltiplas linhas;
+- [X] informar erro léxico ao encontrar caracteres inválidos na entrada, retornando o token
 de erro;
 - [x] definir e atualizar uma variável global e uma função int isRunning(void), que
 mantém e retorna valor true (diferente de 0) durante a análise e muda para false (igual
