@@ -13,12 +13,12 @@
 %%
 
 
-\n                                    { printf ("line = %d\n", lineNumber++);}
+\n                                    { lineNumber++; }
 
 ZZ.*
-XXX                                   {BEGIN(COMMENT);}
-<COMMENT>\n                           {printf ("line = %d\n", lineNumber++);}
-<COMMENT>XXX                          {BEGIN(0);}
+XXX                                   { BEGIN(COMMENT);}
+<COMMENT>\n                           { lineNumber++; }
+<COMMENT>XXX                          { BEGIN(0);}
 <COMMENT>.*
 
 "byte"                                { return KW_BYTE; }
@@ -57,7 +57,7 @@ XXX                                   {BEGIN(COMMENT);}
                                         hashInsert(LIT_STRING, buf);
                                         return LIT_STRING;
                                       }
-<STRING>\n                            { printf("string invalida"); exit(1); }
+<STRING>\n                            { printf("string invalida"); return TOKEN_ERROR; }
 <STRING>.                             { *s++ = *yytext; }
 
 %%
@@ -73,4 +73,8 @@ int isRunning() {
 
 int getLineNumber(){
   return lineNumber;
+}
+
+void initMe(){
+  hashInit();
 }

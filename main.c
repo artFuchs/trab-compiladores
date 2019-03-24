@@ -87,5 +87,7 @@ int main() {
         printf ("%c ", (char) token);
     }
   }
+  printf("\n\nSYMBOL TABLE");
+  printTable();
   return 0;
 }

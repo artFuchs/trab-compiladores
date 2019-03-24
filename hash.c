@@ -34,7 +34,6 @@ NODE* hashInsert(int type, char *text){
   if (Table[addr] == NULL){
     newNode->next = NULL;
     Table[addr] = newNode;
-    printf ("\nnodo {%d,%s} inserido no endereço %d.\n", type, text, addr);
   }
   /* se o bucket estiver cheio, procurar pelo nodo nesse bucket
      se o nodo não estiver no bucket, o nodo passa a apontar para
@@ -44,10 +43,8 @@ NODE* hashInsert(int type, char *text){
     if (node == NULL){
       newNode->next = Table[addr];
       Table[addr] = newNode;
-      printf ("\nnodo {%d,%s} inserido no endereço %d.\n", type, text, addr);
     }else{
       newNode = NULL;
-      printf ("\nnodo {%d,%s} já está na tabela, no endereço %d.\n", type, text, addr);
     }
   }
   return newNode;
@@ -63,4 +60,18 @@ NODE* searchNode(int type, char*text){
       node = node->next;
   }
   return node;
+}
+
+void printTable(){
+  int i=0;
+  for (i=0; i<HASH_SIZE; i++){
+    if (Table[i]!=NULL){
+      printf("%d: {%d,%s}\n", i, Table[i]->type, Table[i]->text);
+      NODE* node = Table[i]->next;
+      while (node!=NULL){
+        printf("-- {%d,%s}\n", node->type, node->text);
+        node = node->next;
+      }
+    }
+  }
 }
