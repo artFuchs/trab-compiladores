@@ -6,6 +6,7 @@
   char buf[1024];
   char *s;
 %}
+%x COMMENT
 
 %x STRING
 
@@ -13,6 +14,13 @@
 
 
 \n                                    { printf ("line = %d\n", lineNumber++);}
+
+ZZ.*
+XXX                                   {BEGIN(COMMENT);}
+<COMMENT>\n                           {printf ("line = %d\n", lineNumber++);}
+<COMMENT>XXX                          {BEGIN(0);}
+<COMMENT>.*
+
 "byte"                                { return KW_BYTE; }
 "int"                                 { return KW_INT; }
 "float"                               { return KW_FLOAT; }
@@ -34,7 +42,7 @@
 "not"                                 { return OPERATOR_NOT; }
 [a-z0-9_]+                            { hashInsert(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 [OIHGFEDCBA]+                         { hashInsert(LIT_INTEGER, yytext); return LIT_INTEGER; }
-[OIHGFEDCBA]+.[OIHGFEDCBA]+           { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
+[OIHGFEDCBA]+\.[OIHGFEDCBA]+           { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
 \'.\'                                 { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
 \"                                    { BEGIN(STRING); s = buf; }
 [ \t]
