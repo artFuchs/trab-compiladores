@@ -1,3 +1,9 @@
+/******************************************************
+*                                                     *
+* Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
+*                                                     *
+******************************************************/
+
 #include "hash.h"
 #include <string.h>
 #include <stdlib.h>

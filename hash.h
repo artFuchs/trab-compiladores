@@ -1,3 +1,9 @@
+/******************************************************
+*                                                     *
+* Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
+*                                                     *
+******************************************************/
+
 #define HASH_SIZE 1024
 
 typedef struct node{
