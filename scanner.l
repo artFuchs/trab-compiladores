@@ -1,10 +1,12 @@
 %{
   #include "tokens.h"
+  #include "hash.h"
   int running = 1;
+  int lineNumber = 1;
 %}
 
 %%
-\n                                    { printf ("line = %d\n", yylineno++);}
+\n                                    { printf ("line = %d\n", lineNumber++);}
 "byte"                                { return KW_BYTE; }
 "int"                                 { return KW_INT; }
 "float"                               { return KW_FLOAT; }
@@ -24,11 +26,11 @@
 "&&"                                  { return OPERATOR_AND; }
 "||"                                  { return OPERATOR_OR; }
 "not"                                 { return OPERATOR_NOT; }
-[a-z0-9_]+                            { return TK_IDENTIFIER; }
-[OIHGFEDCBA]+                         { return LIT_INTEGER; }
-[OIHGFEDCBA]+.[OIHGFEDCBA]+           { return LIT_FLOAT; }
-\'.\'                                 { return LIT_CHAR; }
-\"[a-zA-Z0-9]*\"                      { return LIT_STRING; }
+[a-z0-9_]+                            { hashInsert(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
+[OIHGFEDCBA]+                         { hashInsert(LIT_INTEGER, yytext); return LIT_INTEGER; }
+[OIHGFEDCBA]+.[OIHGFEDCBA]+           { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
+\'.\'                                 { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
+\"[a-zA-Z0-9]*\"                      { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
 [ \t]
 .                                     { return TOKEN_ERROR; }
 %%
@@ -40,4 +42,8 @@ int yywrap() {
 
 int isRunning() {
   return running;
+}
+
+int getLineNumber(){
+  return lineNumber;
 }
