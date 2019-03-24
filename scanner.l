@@ -3,9 +3,15 @@
   #include "hash.h"
   int running = 1;
   int lineNumber = 1;
+  char buf[1024];
+  char *s;
 %}
 
+%x STRING
+
 %%
+
+
 \n                                    { printf ("line = %d\n", lineNumber++);}
 "byte"                                { return KW_BYTE; }
 "int"                                 { return KW_INT; }
@@ -30,9 +36,22 @@
 [OIHGFEDCBA]+                         { hashInsert(LIT_INTEGER, yytext); return LIT_INTEGER; }
 [OIHGFEDCBA]+.[OIHGFEDCBA]+           { hashInsert(LIT_FLOAT, yytext); return LIT_FLOAT; }
 \'.\'                                 { hashInsert(LIT_CHAR, yytext); return LIT_CHAR; }
-\"[a-zA-Z0-9]*\"                      { hashInsert(LIT_STRING, yytext); return LIT_STRING; }
+\"                                    { BEGIN(STRING); s = buf; }
 [ \t]
 .                                     { return TOKEN_ERROR; }
+
+<STRING>\\n                           { *s++ = '\n'; }
+<STRING>\\t                           { *s++ = '\t'; }
+<STRING>\\\"                          { *s++ = '\"'; }
+<STRING>\"                            {
+                                        *s = 0;
+                                        BEGIN 0;
+                                        hashInsert(LIT_STRING, buf);
+                                        return LIT_STRING;
+                                      }
+<STRING>\n                            { printf("string invalida"); exit(1); }
+<STRING>.                             { *s++ = *yytext; }
+
 %%
 
 int yywrap() {
