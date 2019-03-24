@@ -1,0 +1,10 @@
+// ignora arquivos sem extensão
+*
+!/**/
+!*.*
+
+//ignora arquivos objeto
+*.o
+
+//ignora arquivo fonte do lex gerado ao compilar o scanner.l
+lex.yy.c
