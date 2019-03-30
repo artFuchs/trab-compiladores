@@ -9,14 +9,16 @@
 #include "tokens.h"
 #include "hash.h"
 
+
 //lex.yy.h
 int yylex();
 extern char *yytext;
 
 int isRunning();
+void initMe();
 
 int main() {
-  hashInit();
+  initMe();
   while (isRunning()){
     int token = yylex();
     switch (token){
@@ -93,7 +95,7 @@ int main() {
         printf ("%c ", (char) token);
     }
   }
-  printf("\n\nSYMBOL TABLE");
+  printf("\n\nSYMBOL TABLE\n");
   printTable();
   return 0;
 }

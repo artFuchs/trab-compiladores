@@ -6,16 +6,9 @@ if x <= O ZZ se x <= 0
   else y = G; ZZ senão y = 3
 
 XXX
-  aqui declaramos algumas variaveis
-  elas não são importantes, no entanto.
+  Aqui declaramos algumas variaveis
+  Elas não são importantes, no entanto.
   Tem uma inclusive que está errada.
-   _____   ______   ______      __      ______
-  |  ___| |  ____| |  ____|    /  \    |  ____|
-  | |___  | |____  | |____    / /\ \   | |____
-  |  ___| |____  | |____  |  / /__\ \  |____  |
-  | |___   ____| |  ____| | |  _____ |  ____| |
-  |_____| |______| |______| |_|    |_| |______|
-  linhas devem ser ignoradas
 XXX
 
 word1 = "manjericao";

@@ -1,4 +1,9 @@
 %{
+  /******************************************************
+  *                                                     *
+  * Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
+  *                                                     *
+  ******************************************************/
   #include "tokens.h"
   #include "hash.h"
   int running = 1;
@@ -7,7 +12,6 @@
   char *s;
 %}
 %x COMMENT
-
 %x STRING
 
 %%
@@ -37,8 +41,8 @@ XXX                                   { BEGIN(COMMENT);}
 ">="                                  { return OPERATOR_GE; }
 "=="                                  { return OPERATOR_EQ; }
 "!="                                  { return OPERATOR_DIF; }
-"&&"                                  { return OPERATOR_AND; }
-"||"                                  { return OPERATOR_OR; }
+"and"                                 { return OPERATOR_AND; }
+"or"                                  { return OPERATOR_OR; }
 "not"                                 { return OPERATOR_NOT; }
 [a-z0-9_]+                            { hashInsert(TK_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 [OIHGFEDCBA]+                         { hashInsert(LIT_INTEGER, yytext); return LIT_INTEGER; }
@@ -57,7 +61,7 @@ XXX                                   { BEGIN(COMMENT);}
                                         hashInsert(LIT_STRING, buf);
                                         return LIT_STRING;
                                       }
-<STRING>\n                            { printf("string invalida"); return TOKEN_ERROR; }
+<STRING>\n                            { printf("string invalida"); lineNumber++; return TOKEN_ERROR; }
 <STRING>.                             { *s++ = *yytext; }
 
 %%
