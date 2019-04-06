@@ -14,7 +14,7 @@ INIVETOR =
     | nada
     
 INIVETOR' = 
-    , VALOR INIVETOR' 
+    branco VALOR INIVETOR' 
     | nada
 
 
