@@ -17,3 +17,11 @@ de erro;
 - [x] definir e atualizar uma variável global e uma função int isRunning(void), que
 mantém e retorna valor true (diferente de 0) durante a análise e muda para false (igual
 a 0) ao encontrar a marca de fim de arquivo;
+
+## Etapa 2
+Fazer um analisador sintático utilizando-se das ferramentas lex e yacc. A analise sintática deve:
+- [] reconhecer os programas que fazem parte da linguagem
+  - [] criar uma gramática que reconheça o programa
+  - [] criar o "parser.y"
+- [] imprimir mensagem de erro sintático para programas não reconhecidos
+- [] os nodos armazenados na tabela hash devem distinguir entre os tipos de símbolos armazenados e o nodo deve ser associado ao token retornado através da atribuição para yylval.symbol;

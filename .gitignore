@@ -5,6 +5,7 @@
 
 //ignora arquivos objeto
 *.o
+*.tgz
 
 //ignora arquivo fonte do lex gerado ao compilar o scanner.l
 lex.yy.c
