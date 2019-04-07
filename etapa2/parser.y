@@ -43,6 +43,10 @@
 %left '*' '/'
 %right OPERATOR_NOT
 
+%union {
+  struct node *symbol;
+}
+
 %%
 
 program: decl_list ;
@@ -151,10 +155,4 @@ value: LIT_INTEGER
 void yyerror (char *s){
   fprintf(stderr, "Line %d: %s\n", getLineNumber(), s);
   exit(3);
-}
-
-int main(){
-  initMe();
-  yyparse();
-  return 0;
 }
