@@ -2,35 +2,35 @@ PROG = DECLARACOES
 
 DECLARAÇÕES =
     DECL_FUNÇÃO; DECLARAÇÕES
-    | DECL_VARIÁVEL; DECLARAÇÕES 
+    | DECL_VARIÁVEL; DECLARAÇÕES
     | nada
 
-DECL_VARIÁVEL = 
+DECL_VARIÁVEL =
     TIPO ID = VALOR
     | TIPO ID [ VALORINT ] INIVETOR
-    
+
 INIVETOR =
     : VALOR INIVETOR'
     | nada
-    
-INIVETOR' = 
-    branco VALOR INIVETOR' 
+
+INIVETOR' =
+    VALOR INIVETOR' 
     | nada
 
 
 DECL_FUNÇÃO = TIPO ID (PARAMS) BLOCO
-PARAMS = 
+PARAMS =
     TIPO NOME, PARAMS
     | nada
 
 BLOCO = { BL_COMANDOS }
 
-BL_COMANDOS = 
+BL_COMANDOS =
     COMANDO; BL_COMANDOS
     | COMANDO
     | nada
-    
-COMANDO = 
+
+COMANDO =
     ID = EXPRESSAO
     | ID [ EXPRESSAO ] = EXPRESSAO
     | CONTROLE_FLUXO
@@ -38,22 +38,22 @@ COMANDO =
     | print ELEMENTOS
     | return EXPRESSAO
     | BLOCO
-    
-ELEMENTOS = 
+
+ELEMENTOS =
     STRING ELEMENTOS'
     | EXPRESSAO ELEMENTOS'
-    
+
 ELEMENTOS =
     , STRING ELEMENTOS'
     | , EXPRESSAO ELEMENTOS'
     | nada
-    
+
 CONTROLE_FLUXO =
     if (EXPRESSAO) then COMANDO else COMANDO
     | if (EXPRESSAO) then COMANDO
     | loop (EXPRESSAO) COMANDO
     | leap
-    
+
 EXPRESSAO =
     ID
     | ID [ EXPRESSAO ]
