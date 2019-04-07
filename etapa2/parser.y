@@ -5,8 +5,11 @@
   *                                                     *
   ******************************************************/
   #include <stdio.h>
+  #include <stdlib.h>
   int yylex(void);
   void yyerror(char *);
+  int getLineNumber();
+  void initMe();
 %}
 
 %token KW_BYTE
@@ -146,10 +149,12 @@ value: LIT_INTEGER
 %%
 
 void yyerror (char *s){
-  fprintf(stderr, "%s\n", s);
+  fprintf(stderr, "Line %d: %s\n", getLineNumber(), s);
+  exit(3);
 }
 
 int main(){
+  initMe();
   yyparse();
   return 0;
 }

@@ -6,8 +6,8 @@
   ******************************************************/
   #include "y.tab.h"
   #include "hash.h"
-  int running = 1;
-  int lineNumber = 1;
+  int running;
+  int lineNumber;
   char buf[1024];
   char *s;
 %}
@@ -80,5 +80,7 @@ int getLineNumber(){
 }
 
 void initMe(){
+  lineNumber = 1;
+  running = 1;
   hashInit();
 }
