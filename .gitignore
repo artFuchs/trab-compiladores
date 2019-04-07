@@ -1,11 +1,12 @@
-// ignora arquivos sem extensão
+// ignora executáveis
 *
-!/**/
-!*.*
 
-//ignora arquivos objeto
+// menos os Makefiles
+!*/Makefile
+
+// ignora arquivos objeto
 *.o
 *.tgz
 
-//ignora arquivo fonte do lex gerado ao compilar o scanner.l
+// ignora arquivo fonte do lex gerado ao compilar o scanner.l
 lex.yy.c

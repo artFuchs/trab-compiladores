@@ -15,3 +15,4 @@ hash.o: hash.c
 clean:
 	rm *.o
 	rm lex.* y.* etapa2
+
