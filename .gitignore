@@ -1,9 +1,3 @@
-// ignora executáveis
-*
-
-// menos os Makefiles
-!*/Makefile
-
 // ignora arquivos objeto
 *.o
 *.tgz
