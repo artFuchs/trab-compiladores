@@ -1,0 +1,14 @@
+ZZ UFRGS - Compiladores - Marcelo Johann - 2019/1
+
+byte a = O;
+byte 1 = O;
+int v [IO]: O O O O O O O O O O;
+int mat [IO];
+float f = IO.EE;
+byte c = 'x';
+byte x = DE;
+
+byte main ()
+{
+  print "Digite um numero: \n";
+};

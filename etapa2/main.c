@@ -3,12 +3,31 @@
 #include "hash.h"
 #include "y.tab.h"
 
+
 void initMe();
+extern FILE *yyin;
 
+void readFile(char *filename){
+	FILE* file = fopen(filename, "r");
+	if(file == NULL){
+		fprintf(stderr, "%s", "Can't open file. \n");
+		exit(1);
+	}
 
-int main(){
+	yyin = file;
+	yyparse();
+
+	printTable();
+}
+
+int main(int argc, char *argv[]){
+  if(argc < 2){
+		fprintf(stderr, "%s", "Missing file name! Command format: ./etapa2 <file_name> \n");
+		exit(1);
+	}
+
   initMe();
-  yyparse();
-  printTable();
+  readFile(argv[1]);
+
   return 0;
 }

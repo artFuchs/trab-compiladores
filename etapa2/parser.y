@@ -107,11 +107,14 @@ rest_print_list: ',' LIT_STRING rest_print_list
                |
                ;
 
-flux_control: KW_IF '(' expr ')' KW_THEN comand KW_ELSE comand      {printf ("if then else\n");}
-            | KW_IF '(' expr ')' KW_THEN comand                     {printf ("if then\n");}
+flux_control: KW_IF '(' expr ')' KW_THEN comand else_statement       {printf ("if then\n");}
             | KW_LOOP '(' expr ')' comand                           {printf ("loop\n");}
             | KW_LEAP                                               {printf ("leap\n");}
             ;
+
+else_statement: KW_ELSE comand                                      {printf ("else");}
+              |
+              ;
 
 expr: TK_IDENTIFIER
     | TK_IDENTIFIER '[' expr ']'

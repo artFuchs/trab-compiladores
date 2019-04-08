@@ -22,7 +22,7 @@ int hashAddress(char* text){
   int addr = 1;
   int i;
   for (i = 0; i<strlen(text); i++){
-    addr = (addr*text[i])*(i+1)%HASH_SIZE;
+    addr = ((addr*text[i])*(i+1))%HASH_SIZE+1;
   }
   return addr - 1;
 }
@@ -30,7 +30,7 @@ int hashAddress(char* text){
 NODE* hashInsert(int type, char *text){
   NODE* newNode;
   newNode = calloc(1, sizeof(NODE));
-  newNode->type = type;
+  memcpy(&newNode->type,&type,sizeof(int));
   newNode->text = calloc(strlen(text)+1, sizeof(char));
   strcpy(newNode->text, text);
 

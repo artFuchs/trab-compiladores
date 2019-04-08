@@ -57,7 +57,7 @@ XXX                                   { BEGIN(COMMENT);}
 "not"                                 { return OPERATOR_NOT; }
 [a-z0-9_]+                            { yylval.symbol = hashInsert(SYMBOL_IDENTIFIER, yytext); return TK_IDENTIFIER; }
 [OIHGFEDCBA]+                         { yylval.symbol = hashInsert(SYMBOL_LIT_INT, yytext); return LIT_INTEGER; }
-[OIHGFEDCBA]+\.[OIHGFEDCBA]+           { yylval.symbol = hashInsert(SYMBOL_LIT_FLOAT, yytext); return LIT_FLOAT; }
+[OIHGFEDCBA]+\.[OIHGFEDCBA]+          { yylval.symbol = hashInsert(SYMBOL_LIT_FLOAT, yytext); return LIT_FLOAT; }
 \'.\'                                 { yylval.symbol = hashInsert(SYMBOL_LIT_CHAR, yytext); return LIT_CHAR; }
 \"                                    { BEGIN(STRING); s = buf; }
 [ \t]
