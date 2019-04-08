@@ -25,4 +25,4 @@ Fazer um analisador sintático utilizando-se das ferramentas lex e yacc. A anali
   - [X] criar uma gramática que reconheça o programa
   - [X] criar o "parser.y"
 - [X] imprimir mensagem de erro sintático para programas não reconhecidos, informando a linha do erro e retornando o código de erro 3
-- [ ] os nodos armazenados na tabela hash devem distinguir entre os tipos de símbolos armazenados e o nodo deve ser associado ao token retornado através da atribuição para yylval.symbol;
+- [X] os nodos armazenados na tabela hash devem distinguir entre os tipos de símbolos armazenados e o nodo deve ser associado ao token retornado através da atribuição para yylval.symbol;
