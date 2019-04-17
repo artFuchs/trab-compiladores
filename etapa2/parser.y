@@ -37,6 +37,9 @@
 %token LIT_STRING
 %token TOKEN_ERROR
 
+%nonassoc LOWER_THAN_ELSE
+%nonassoc KW_ELSE
+
 %left OPERATOR_OR OPERATOR_AND
 %left '<' '>' OPERATOR_LE OPERATOR_GE OPERATOR_EQ OPERATOR_DIF
 %left '-' '+'
@@ -49,12 +52,12 @@
 
 %%
 
-program: decl_list ;
+program: decl_list;
 
-decl_list: decl_var ';' decl_list
-            | decl_func ';' decl_list
-            |
-            ;
+decl_list : decl_var ';' decl_list
+          | decl_func ';' decl_list
+          |
+          ;
 
 decl_var: type TK_IDENTIFIER '=' value                      {printf("declaracao de variavel\n");}
         | type TK_IDENTIFIER '[' LIT_INTEGER ']' inivector  {printf("declaracao de vetor\n");}
@@ -84,7 +87,6 @@ param: type TK_IDENTIFIER;
 block: '{' bl_comands '}';
 
 bl_comands: comand ';' bl_comands
-          | comand
           |
           ;
 
@@ -98,23 +100,20 @@ comand: TK_IDENTIFIER '=' expr
       |
       ;
 
-print_list: LIT_STRING rest_print_list
-          | expr rest_print_list
+// if (asd) then print l0 l1 l2 else cmd ;
+
+print_list: expr rest_print_list
           ;
 
-rest_print_list: ',' LIT_STRING rest_print_list
-               | ',' expr rest_print_list
+rest_print_list: ',' expr rest_print_list
                |
                ;
 
-flux_control: KW_IF '(' expr ')' KW_THEN comand else_statement       {printf ("if then\n");}
-            | KW_LOOP '(' expr ')' comand                           {printf ("loop\n");}
-            | KW_LEAP                                               {printf ("leap\n");}
+flux_control: KW_IF '(' expr ')' KW_THEN comand   %prec LOWER_THAN_ELSE   {printf ("if then\n");}
+            | KW_IF '(' expr ')' KW_THEN comand KW_ELSE comand            {printf ("if then else\n");}
+            | KW_LOOP '(' expr ')' comand                                 {printf ("loop\n");}
+            | KW_LEAP                                                     {printf ("leap\n");}
             ;
-
-else_statement: KW_ELSE comand                                      {printf ("else");}
-              |
-              ;
 
 expr: TK_IDENTIFIER
     | TK_IDENTIFIER '[' expr ']'
@@ -133,6 +132,7 @@ expr: TK_IDENTIFIER
     | expr OPERATOR_GE expr
     | expr OPERATOR_EQ expr
     | expr OPERATOR_DIF expr
+    | '(' expr ')'
     ;
 
 arg_list: expr rest_arg_list
