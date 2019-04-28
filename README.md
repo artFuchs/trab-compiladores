@@ -28,7 +28,7 @@ Fazer um analisador sintático utilizando-se das ferramentas lex e yacc. A anali
 - [X] os nodos armazenados na tabela hash devem distinguir entre os tipos de símbolos armazenados e o nodo deve ser associado ao token retornado através da atribuição para yylval.symbol;
 
 ## Etapa 3
-- [X] Corrijir a especificação das suas expressões em relação à etapa anterior, simplificando-­as de forma que as produções utilizem a forma mais simples que é ambígua, e retirando a ambiguidade pela declaração da precedência correta dos operadores com as definições %left, %right ou %nonassoc    
-- [ ] Implementar a estrutura da árvore de sintaxe, com funções de criação de nodo, impressão de um nodo e impressão da árvore;
-- [ ] Colocar ações sintátivas ao lado das regras de produção descritas no arquivo para o yacc, as quais criam ou propagam os nodos da árvore, montando-a recursivamente segundo a análise. A maior parte das ações serão chamadas à rotina de criação do nodo;
-- [ ] Implementar uma rotina que percorre a árvore e gera um programa fonte semelhante, funcionalmente semelhante ao programa analisado;
+- [X] Corrigir a especificação das suas expressões em relação à etapa anterior, simplificando-­as de forma que as produções utilizem a forma mais simples que é ambígua, e retirando a ambiguidade pela declaração da precedência correta dos operadores com as definições %left, %right ou %nonassoc;
+- [X] implementar a estrutura da árvore de sintaxe, com funções de criação de nodo, impressão de um nodo e impressão da árvore;
+- [X] colocar ações sintátivas ao lado das regras de produção descritas no arquivo para o yacc, as quais criam ou propagam os nodos da árvore, montando-a recursivamente segundo a análise. A maior parte das ações serão chamadas à rotina de criação do nodo;
+- [ ] implementar uma rotina que percorre a árvore e gera um programa fonte funcionalmente semelhante ao programa analisado.
