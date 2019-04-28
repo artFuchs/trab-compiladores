@@ -26,6 +26,9 @@ void printNode (AST* node, int depth){
   }
   switch (node->type){
     case AST_SYMBOL: printf("AST_SYMBOL"); break;
+    case AST_VAR_DECL: printf("AST_VAR_DECL"); break;
+    case AST_ARRAY_DECL: printf("AST_ARRAY_DECL"); break;
+    case AST_FUNC_DECL: printf("AST_FUNC_DECL"); break;
     case AST_ADD: printf("AST_ADD"); break;
     case AST_SUB: printf("AST_SUB"); break;
     case AST_MUL: printf("AST_MUL"); break;
@@ -38,8 +41,10 @@ void printNode (AST* node, int depth){
     case AST_LE: printf("AST_LE"); break;
     case AST_GE: printf("AST_GE"); break;
     case AST_EQ: printf("AST_EQ"); break;
+    case AST_DIF: printf("AST_DIF"); break;
     case AST_ASSIGN: printf("AST_ASSIGN"); break;
     case AST_ARRAY_ASSIGN: printf("AST_ARRAY_ASSIGN"); break;
+    case AST_FUNC_CALL: printf("AST_FUNC_CALL"); break;
     case AST_IF: printf("AST_IF"); break;
     case AST_IF_ELSE: printf("AST_IF_ELSE"); break;
     case AST_LOOP: printf("AST_LOOP"); break;
@@ -47,6 +52,7 @@ void printNode (AST* node, int depth){
     case AST_NO_DELIMITER_LIST: printf("AST_NO_DELIMITER_LIST"); break;
     case AST_COMMA_DELIMITED_LIST: printf("AST_COMMA_DELIMITED_LIST"); break;
     case AST_SEMICOLON_DELIMITED_LIST: printf("AST_SEMICOLON_DELIMITED_LIST"); break;
+    case AST_PARAM_ELEM: printf("AST_PARAM_ELEM"); break;
     case AST_PRINT: printf("AST_PRINT"); break;
     case AST_READ: printf("AST_READ"); break;
     case AST_RETURN: printf("AST_RETURN"); break;
@@ -56,6 +62,9 @@ void printNode (AST* node, int depth){
     case AST_FLOAT: printf("AST_FLOAT"); break;
     case AST_CHAR: printf("AST_CHAR"); break;
     case AST_STRING: printf("AST_STRING"); break;
+    case AST_TINT: printf("AST_TINT"); break;
+    case AST_TFLOAT: printf("AST_TFLOAT"); break;
+    case AST_TBYTE: printf("AST_TBYTE"); break;
     default: printf("AST_INVALID"); break;
   }
   if (node->symbol!=0){
