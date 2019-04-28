@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "ast_const.h"
 #include "hash.h"
 
 typedef struct syntax_node{
