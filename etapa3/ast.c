@@ -12,10 +12,27 @@ AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST
   return newNode;
 }
 
-void printNode (AST* node){
-
+void printNode (AST* node, int depth){
+  if (node == NULL) return;
+  int i = 0;
+  for (i=0;i<depth;i++){
+    printf("| ");
+  }
+  switch (node->type){
+    case 0: printf("AST_SYMBOL"); break;
+    default: printf("AST_INVALID"); break;
+  }
+  if (node->symbol!=0){
+    printf (", %s", node->symbol->text);
+  }
+  printf("\n");
 }
 
-void printTree (AST* root){
-
+void printTree (AST* root, int depth){
+  if (root == NULL) return;
+  printNode(root, depth);
+  printTree(root->son1, depth+1);
+  printTree(root->son2, depth+1);
+  printTree(root->son3, depth+1);
+  printTree(root->son4, depth+1);
 }
