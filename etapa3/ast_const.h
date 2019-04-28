@@ -31,7 +31,7 @@
 #define AST_IF 40
 #define AST_IF_ELSE 41
 #define AST_LOOP 42
-#define AST_LEAP
+#define AST_LEAP 43
 
 #define AST_NO_DELIMITER_LIST 50
 #define AST_COMMA_DELIMITED_LIST 51
