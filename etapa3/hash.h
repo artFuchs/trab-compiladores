@@ -3,6 +3,7 @@
 * Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
 *                                                     *
 ******************************************************/
+
 #ifndef HASH_H
 #define HASH_H
 

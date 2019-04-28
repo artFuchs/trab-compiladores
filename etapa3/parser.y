@@ -6,36 +6,56 @@
   ******************************************************/
   #include <stdio.h>
   #include <stdlib.h>
+  #include "ast.h"
   int yylex(void);
   void yyerror(char *);
   int getLineNumber();
   void initMe();
 %}
 
-%token KW_BYTE
-%token KW_INT
-%token KW_FLOAT
-%token KW_IF
-%token KW_THEN
-%token KW_ELSE
-%token KW_LOOP
-%token KW_LEAP
-%token KW_READ
-%token KW_RETURN
-%token KW_PRINT
-%token OPERATOR_LE
-%token OPERATOR_GE
-%token OPERATOR_EQ
-%token OPERATOR_DIF
-%token OPERATOR_OR
-%token OPERATOR_AND
-%token OPERATOR_NOT
-%token TK_IDENTIFIER
-%token LIT_INTEGER
-%token LIT_FLOAT
-%token LIT_CHAR
-%token LIT_STRING
-%token TOKEN_ERROR
+%token<symbol> KW_BYTE
+%token<symbol> KW_INT
+%token<symbol> KW_FLOAT
+%token<symbol> KW_IF
+%token<symbol> KW_THEN
+%token<symbol> KW_ELSE
+%token<symbol> KW_LOOP
+%token<symbol> KW_LEAP
+%token<symbol> KW_READ
+%token<symbol> KW_RETURN
+%token<symbol> KW_PRINT
+%token<symbol> OPERATOR_LE
+%token<symbol> OPERATOR_GE
+%token<symbol> OPERATOR_EQ
+%token<symbol> OPERATOR_DIF
+%token<symbol> OPERATOR_OR
+%token<symbol> OPERATOR_AND
+%token<symbol> OPERATOR_NOT
+%token<symbol> TK_IDENTIFIER
+%token<symbol> LIT_INTEGER
+%token<symbol> LIT_FLOAT
+%token<symbol> LIT_CHAR
+%token<symbol> LIT_STRING
+%token<symbol> TOKEN_ERROR
+
+%type<ast> program
+%type<ast> decl_var
+%type<ast> inivector
+%type<ast> rest_inivector
+%type<ast> decl_func
+%type<ast> param_list
+%type<ast> rest_param_list
+%type<ast> param
+%type<ast> block
+%type<ast> bl_commands
+%type<ast> command
+%type<ast> print_list
+%type<ast> rest_print_list
+%type<ast> flux_control
+%type<ast> expr
+%type<ast> arg_list
+%type<ast> rest_arg_list
+%type<ast> type
 
 %nonassoc LOWER_THAN_ELSE
 %nonassoc KW_ELSE
@@ -48,6 +68,7 @@
 
 %union {
   struct node *symbol;
+  AST *ast;
 }
 
 %%
@@ -64,33 +85,33 @@ decl_var: type TK_IDENTIFIER '=' value                      {printf("declaracao 
         ;
 
 inivector: ':' value rest_inivector
-         |
-         ;
+        |
+        ;
 
 rest_inivector: value rest_inivector
               |
               ;
 
 decl_func: type TK_IDENTIFIER '(' param_list ')' block     {printf("declaração de funcao\n");}
-         ;
+        ;
 
 param_list: param rest_param_list
           |
           ;
 
 rest_param_list: ',' type TK_IDENTIFIER rest_param_list
-           |
-           ;
-
-param: type TK_IDENTIFIER;
-
-block: '{' bl_comands '}';
-
-bl_comands: comand ';' bl_comands
           |
           ;
 
-comand: TK_IDENTIFIER '=' expr
+param: type TK_IDENTIFIER;
+
+block: '{' bl_commands '}';
+
+bl_commands: command ';' bl_commands
+          |
+          ;
+
+command: TK_IDENTIFIER '=' expr
       | TK_IDENTIFIER '[' expr ']' '=' expr
       | flux_control
       | KW_READ TK_IDENTIFIER
@@ -106,12 +127,12 @@ print_list: expr rest_print_list
           ;
 
 rest_print_list: ',' expr rest_print_list
-               |
-               ;
+              |
+              ;
 
-flux_control: KW_IF '(' expr ')' KW_THEN comand   %prec LOWER_THAN_ELSE   {printf ("if then\n");}
-            | KW_IF '(' expr ')' KW_THEN comand KW_ELSE comand            {printf ("if then else\n");}
-            | KW_LOOP '(' expr ')' comand                                 {printf ("loop\n");}
+flux_control: KW_IF '(' expr ')' KW_THEN command   %prec LOWER_THAN_ELSE   {printf ("if then\n");}
+            | KW_IF '(' expr ')' KW_THEN command KW_ELSE command            {printf ("if then else\n");}
+            | KW_LOOP '(' expr ')' command                                 {printf ("loop\n");}
             | KW_LEAP                                                     {printf ("leap\n");}
             ;
 
@@ -138,8 +159,8 @@ expr: TK_IDENTIFIER
 arg_list: expr rest_arg_list
 
 rest_arg_list: ',' expr rest_arg_list
-             |
-             ;
+            |
+            ;
 
 type: KW_INT
     | KW_FLOAT
@@ -147,10 +168,10 @@ type: KW_INT
     ;
 
 value: LIT_INTEGER
-     | LIT_FLOAT
-     | LIT_CHAR
-     | LIT_STRING
-     ;
+    | LIT_FLOAT
+    | LIT_CHAR
+    | LIT_STRING
+    ;
 
 
 %%

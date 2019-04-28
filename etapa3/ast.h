@@ -1,8 +1,15 @@
+/******************************************************
+*                                                     *
+* Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
+*                                                     *
+******************************************************/
+
 #ifndef SYNTAXTREE_H
 #define SYNTAXTREE_H
 
 #include <stdlib.h>
 #include <stdio.h>
+#include "ast_const.h"
 #include "hash.h"
 
 typedef struct syntax_node{

@@ -1,3 +1,9 @@
+/******************************************************
+*                                                     *
+* Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
+*                                                     *
+******************************************************/
+
 #include "ast.h"
 
 AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST* son4){
