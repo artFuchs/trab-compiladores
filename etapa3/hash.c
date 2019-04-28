@@ -50,7 +50,7 @@ NODE* hashInsert(int type, char *text){
       newNode->next = Table[addr];
       Table[addr] = newNode;
     }else{
-      newNode = NULL;
+      newNode = node;
     }
   }
   return newNode;
