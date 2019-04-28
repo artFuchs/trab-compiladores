@@ -1,3 +1,9 @@
+/******************************************************
+*                                                     *
+* Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
+*                                                     *
+******************************************************/
+
 #ifndef SYNTAXTREE_H
 #define SYNTAXTREE_H
 
