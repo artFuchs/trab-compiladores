@@ -13,33 +13,36 @@
   void initMe();
 %}
 
-%token<symbol> KW_BYTE
-%token<symbol> KW_INT
-%token<symbol> KW_FLOAT
-%token<symbol> KW_IF
-%token<symbol> KW_THEN
-%token<symbol> KW_ELSE
-%token<symbol> KW_LOOP
-%token<symbol> KW_LEAP
-%token<symbol> KW_READ
-%token<symbol> KW_RETURN
-%token<symbol> KW_PRINT
-%token<symbol> OPERATOR_LE
-%token<symbol> OPERATOR_GE
-%token<symbol> OPERATOR_EQ
-%token<symbol> OPERATOR_DIF
-%token<symbol> OPERATOR_OR
-%token<symbol> OPERATOR_AND
-%token<symbol> OPERATOR_NOT
+%token KW_BYTE
+%token KW_INT
+%token KW_FLOAT
+%token KW_IF
+%token KW_THEN
+%token KW_ELSE
+%token KW_LOOP
+%token KW_LEAP
+%token KW_READ
+%token KW_RETURN
+%token KW_PRINT
+%token OPERATOR_LE
+%token OPERATOR_GE
+%token OPERATOR_EQ
+%token OPERATOR_DIF
+%token OPERATOR_OR
+%token OPERATOR_AND
+%token OPERATOR_NOT
+
 %token<symbol> TK_IDENTIFIER
 %token<symbol> LIT_INTEGER
 %token<symbol> LIT_FLOAT
 %token<symbol> LIT_CHAR
 %token<symbol> LIT_STRING
-%token<symbol> TOKEN_ERROR
+%token TOKEN_ERROR
 
 %type<ast> program
+%type<ast> decl_list
 %type<ast> decl_var
+%type<ast> vector_range
 %type<ast> inivector
 %type<ast> rest_inivector
 %type<ast> decl_func
@@ -56,6 +59,7 @@
 %type<ast> arg_list
 %type<ast> rest_arg_list
 %type<ast> type
+%type<ast> value
 
 %nonassoc LOWER_THAN_ELSE
 %nonassoc KW_ELSE
@@ -67,111 +71,116 @@
 %right OPERATOR_NOT
 
 %union {
+  struct syntax_node *ast;
   struct node *symbol;
-  AST *ast;
 }
 
 %%
 
-program: decl_list;
+program: decl_list                       {$$ = $1; printTree($$,0); }
+       ;
 
-decl_list : decl_var ';' decl_list
-          | decl_func ';' decl_list
-          |
+decl_list : decl_var ';' decl_list        {$$ = newSyntaxNode (AST_SEMICOLON_DELIMITED_LIST,0,$1,$3,0,0);}
+          | decl_func ';' decl_list       {$$ = newSyntaxNode (AST_SEMICOLON_DELIMITED_LIST,0,$1,$3,0,0);}
+          |                               {$$ = 0;}
           ;
 
-decl_var: type TK_IDENTIFIER '=' value                      {printf("declaracao de variavel\n");}
-        | type TK_IDENTIFIER '[' LIT_INTEGER ']' inivector  {printf("declaracao de vetor\n");}
+decl_var: type TK_IDENTIFIER '=' value                       {$$ = newSyntaxNode (AST_VAR_DECL,$2,$1,$4,0,0);}
+        | type TK_IDENTIFIER '[' vector_range ']' inivector  {$$ = newSyntaxNode (AST_ARRAY_DECL,$2,$1,$4,$6,0);}
         ;
 
-inivector: ':' value rest_inivector
-        |
-        ;
+vector_range: LIT_INTEGER                {$$ = newSyntaxNode (AST_SYMBOL,$1,0,0,0,0);}
+            ;
 
-rest_inivector: value rest_inivector
-              |
+inivector: ':' value rest_inivector       {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$2,$3,0,0);}
+         |                                {$$ = 0;}
+         ;
+
+rest_inivector: value rest_inivector      {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$1,$2,0,0);}
+              |                           {$$ = 0;}
               ;
 
-decl_func: type TK_IDENTIFIER '(' param_list ')' block     {printf("declaração de funcao\n");}
-        ;
+decl_func: type TK_IDENTIFIER '(' param_list ')' block     {$$ = newSyntaxNode (AST_FUNC_DECL,$2,$1,$4,$6,0);}
+         ;
 
-param_list: param rest_param_list
-          |
+param_list: param rest_param_list           {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$1,$2,0,0);}
+          |                                 {$$ = 0;}
           ;
 
-rest_param_list: ',' type TK_IDENTIFIER rest_param_list
-          |
+rest_param_list: ',' param rest_param_list   {$$ = newSyntaxNode (AST_COMMA_DELIMITED_LIST,0,$2,$3,0,0);}
+           |                                 {$$ = 0;}
+           ;
+
+param: type TK_IDENTIFIER                        {$$ = newSyntaxNode (AST_PARAM_ELEM,$2,$1,0,0,0);}
+     ;
+
+block: '{' bl_commands '}'                        {$$ = newSyntaxNode (AST_CMD_BLOCK,0,$2,0,0,0);}
+     ;
+
+bl_commands: command ';' bl_commands                {$$ = newSyntaxNode (AST_SEMICOLON_DELIMITED_LIST,0,$1,$3,0,0);}
+          |                                       {$$ = 0;}
           ;
 
-param: type TK_IDENTIFIER;
-
-block: '{' bl_commands '}';
-
-bl_commands: command ';' bl_commands
-          |
-          ;
-
-command: TK_IDENTIFIER '=' expr
-      | TK_IDENTIFIER '[' expr ']' '=' expr
-      | flux_control
-      | KW_READ TK_IDENTIFIER
-      | KW_PRINT print_list
-      | KW_RETURN expr
-      | block
-      |
+command: TK_IDENTIFIER '=' expr                   {$$ = newSyntaxNode (AST_ASSIGN,$1,$3,0,0,0);}
+      | TK_IDENTIFIER '[' expr ']' '=' expr       {$$ = newSyntaxNode (AST_ARRAY_ASSIGN,$1,$3,$6,0,0);}
+      | flux_control                              {$$ = $1;}
+      | KW_READ TK_IDENTIFIER                     {$$ = newSyntaxNode (AST_READ,$2,0,0,0,0);}
+      | KW_PRINT print_list                       {$$ = newSyntaxNode (AST_PRINT,0,$2,0,0,0);}
+      | KW_RETURN expr                            {$$ = newSyntaxNode (AST_RETURN,0,$2,0,0,0);}
+      | block                                     {$$ = $1;}
+      |                                           {$$ = 0;}
       ;
 
-// if (asd) then print l0 l1 l2 else cmd ;
-
-print_list: expr rest_print_list
+print_list: expr rest_print_list                 {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$1,$2,0,0);}
           ;
 
-rest_print_list: ',' expr rest_print_list
-              |
-              ;
+rest_print_list: ',' expr rest_print_list         {$$ = newSyntaxNode (AST_COMMA_DELIMITED_LIST,0,$2,$3,0,0);}
+               |                                  {$$ = 0;}
+               ;
 
-flux_control: KW_IF '(' expr ')' KW_THEN command   %prec LOWER_THAN_ELSE   {printf ("if then\n");}
-            | KW_IF '(' expr ')' KW_THEN command KW_ELSE command            {printf ("if then else\n");}
-            | KW_LOOP '(' expr ')' command                                 {printf ("loop\n");}
-            | KW_LEAP                                                     {printf ("leap\n");}
+flux_control: KW_IF '(' expr ')' KW_THEN command   %prec LOWER_THAN_ELSE   {$$ = newSyntaxNode (AST_IF,0,$3,$6,0,0);}
+            | KW_IF '(' expr ')' KW_THEN command KW_ELSE command            {$$ = newSyntaxNode (AST_IF_ELSE,0,$3,$6,$8,0);}
+            | KW_LOOP '(' expr ')' command                                 {$$ = newSyntaxNode (AST_LOOP,0,$3,$5,0,0);}
+            | KW_LEAP                                                     {$$ = newSyntaxNode (AST_LEAP,0,0,0,0,0);}
             ;
 
-expr: TK_IDENTIFIER
-    | TK_IDENTIFIER '[' expr ']'
-    | value
-    | TK_IDENTIFIER '(' arg_list ')'
-    | expr '+' expr
-    | expr '-' expr
-    | expr '*' expr
-    | expr '/' expr
-    | expr '<' expr
-    | expr '>' expr
-    | expr OPERATOR_AND expr
-    | expr OPERATOR_OR expr
-    | expr OPERATOR_NOT expr
-    | expr OPERATOR_LE expr
-    | expr OPERATOR_GE expr
-    | expr OPERATOR_EQ expr
-    | expr OPERATOR_DIF expr
-    | '(' expr ')'
+expr: TK_IDENTIFIER                   {$$ = newSyntaxNode (AST_SYMBOL,$1,0,0,0,0);}
+    | TK_IDENTIFIER '[' expr ']'      {$$ = newSyntaxNode (AST_SYMBOL,$1,$3,0,0,0);}
+    | value                           {$$ = $1;}
+    | TK_IDENTIFIER '(' arg_list ')'  {$$ = newSyntaxNode (AST_FUNC_CALL,$1,$3,0,0,0);}
+    | expr '+' expr                   {$$ = newSyntaxNode (AST_ADD,0,$1,$3,0,0);}
+    | expr '-' expr                   {$$ = newSyntaxNode (AST_SUB,0,$1,$3,0,0);}
+    | expr '*' expr                   {$$ = newSyntaxNode (AST_MUL,0,$1,$3,0,0);}
+    | expr '/' expr                   {$$ = newSyntaxNode (AST_DIV,0,$1,$3,0,0);}
+    | expr '<' expr                   {$$ = newSyntaxNode (AST_LT,0,$1,$3,0,0);}
+    | expr '>' expr                   {$$ = newSyntaxNode (AST_GT,0,$1,$3,0,0);}
+    | expr OPERATOR_AND expr          {$$ = newSyntaxNode (AST_AND,0,$1,$3,0,0);}
+    | expr OPERATOR_OR expr           {$$ = newSyntaxNode (AST_OR,0,$1,$3,0,0);}
+    | OPERATOR_NOT expr               {$$ = newSyntaxNode (AST_NOT,0,$2,0,0,0);}
+    | expr OPERATOR_LE expr           {$$ = newSyntaxNode (AST_LE,0,$1,$3,0,0);}
+    | expr OPERATOR_GE expr           {$$ = newSyntaxNode (AST_GE,0,$1,$3,0,0);}
+    | expr OPERATOR_EQ expr           {$$ = newSyntaxNode (AST_EQ,0,$1,$3,0,0);}
+    | expr OPERATOR_DIF expr          {$$ = newSyntaxNode (AST_DIF,0,$1,$3,0,0);}
+    | '(' expr ')'                    {$$ = newSyntaxNode (AST_PARENTHESES,0,$2,0,0,0);}
     ;
 
-arg_list: expr rest_arg_list
+arg_list: expr rest_arg_list           {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$1,$2,0,0);}
+        ;
 
-rest_arg_list: ',' expr rest_arg_list
-            |
-            ;
+rest_arg_list: ',' expr rest_arg_list  {$$ = newSyntaxNode (AST_COMMA_DELIMITED_LIST,0,$2,$3,0,0);}
+             |                         {$$ = 0;}
+             ;
 
-type: KW_INT
-    | KW_FLOAT
-    | KW_BYTE
+type: KW_INT              {$$ = newSyntaxNode (AST_TINT,0,0,0,0,0);}
+    | KW_FLOAT            {$$ = newSyntaxNode (AST_TFLOAT,0,0,0,0,0);}
+    | KW_BYTE             {$$ = newSyntaxNode (AST_TBYTE,0,0,0,0,0);}
     ;
 
-value: LIT_INTEGER
-    | LIT_FLOAT
-    | LIT_CHAR
-    | LIT_STRING
-    ;
+value: LIT_INTEGER        {$$ = newSyntaxNode (AST_INTEGER,$1,0,0,0,0);}
+     | LIT_FLOAT          {$$ = newSyntaxNode (AST_FLOAT,$1,0,0,0,0);}
+     | LIT_CHAR           {$$ = newSyntaxNode (AST_CHAR,$1,0,0,0,0);}
+     | LIT_STRING         {$$ = newSyntaxNode (AST_STRING,$1,0,0,0,0);}
+     ;
 
 
 %%

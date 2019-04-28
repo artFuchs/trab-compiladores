@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "hash.h"
 #include "y.tab.h"
-#include "syntaxTree.h"
+#include "ast.h"
 
 void initMe();
 extern FILE *yyin;

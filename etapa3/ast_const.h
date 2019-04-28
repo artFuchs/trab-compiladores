@@ -10,6 +10,9 @@
 #define MAX_SONS 4
 
 #define AST_SYMBOL 1
+#define AST_VAR_DECL 2
+#define AST_ARRAY_DECL 3
+#define AST_FUNC_DECL 4
 
 #define AST_ADD 10
 #define AST_SUB 11
@@ -24,9 +27,11 @@
 #define AST_LE 25
 #define AST_GE 26
 #define AST_EQ 27
+#define AST_DIF 28
 
 #define AST_ASSIGN 30
 #define AST_ARRAY_ASSIGN 31
+#define AST_FUNC_CALL 32
 
 #define AST_IF 40
 #define AST_IF_ELSE 41
@@ -36,6 +41,7 @@
 #define AST_NO_DELIMITER_LIST 50
 #define AST_COMMA_DELIMITED_LIST 51
 #define AST_SEMICOLON_DELIMITED_LIST 52
+#define AST_PARAM_ELEM 53
 
 #define AST_PRINT 60
 #define AST_READ 61
@@ -48,5 +54,9 @@
 #define AST_FLOAT 101
 #define AST_CHAR 102
 #define AST_STRING 103
+
+#define AST_TINT 110
+#define AST_TFLOAT 111
+#define AST_TBYTE 112
 
 #endif

@@ -6,6 +6,7 @@
   ******************************************************/
   #include "y.tab.h"
   #include "hash.h"
+  #include "ast.h"
 
   extern YYSTYPE yylval;
 
