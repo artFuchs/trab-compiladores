@@ -5,6 +5,7 @@
 ******************************************************/
 
 #include "ast.h"
+#include <stdio.h>
 
 AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST* son4){
   AST* newNode = 0;
@@ -79,4 +80,76 @@ void printTree (AST* root, int depth){
   int i;
   for (i=0; i<4; i++)
     printTree(root->sons[i], depth+1);
+}
+
+void decompile (AST* node, FILE* output){
+  if (node == NULL || output == NULL) return;
+  switch (node->type){
+    case AST_SYMBOL:
+      fprintf (output, "%s ", node->symbol->text);
+      if (node->sons[0]){
+        fprintf (output, "[ ");
+        decompile (node->sons[1], output);
+        fprintf (output, " ]");
+      }
+      break;
+    case AST_VAR_DECL:
+      decompile (node->sons[0], output);
+      fprintf (output, "%s = ", node->symbol->text);
+      decompile (node->sons[1], output);
+      break;
+    case AST_ARRAY_DECL:
+      decompile (node->sons[0], output);
+      fprintf (output, "%s [ ", node->symbol->text);
+      decompile (node->sons[1], output);
+      fprintf (output, " ]");
+      if (node->sons[2]){
+        fprintf(output, ": ");
+        decompile(node->sons[2], output);
+      }
+      break;
+    case AST_FUNC_DECL:
+      decompile (node->sons[0], output);
+      fprintf (output, "%s ( ", node->symbol->text);
+      decompile (node->sons[1], output);
+      fprintf (output, ")");
+      decompile (node->sons[2], output);
+      break;
+    case AST_ADD:
+      decompile (node->sons[0], output);
+      fprintf (output, " + ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_SUB:
+      decompile (node->sons[0], output);
+      fprintf (output, " - ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_MUL:
+      decompile (node->sons[0], output);
+      fprintf (output, " * ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_DIV:
+      decompile (node->sons[0], output);
+      fprintf (output, " / ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_AND:
+      decompile (node->sons[0], output);
+      fprintf (output, " and ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_OR:
+      decompile (node->sons[0], output);
+      fprintf (output, " or ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_NOT:
+      fprintf (output, " not ");
+      decompile (node->sons[0], output);
+    // case ast LT até AST ASSIGN é igual a acima
+
+    default: return;
+  }
 }

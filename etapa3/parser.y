@@ -77,7 +77,7 @@
 
 %%
 
-program: decl_list                       {$$ = $1; printTree($$,0); }
+program: decl_list                       {$$ = $1; printTree($$,0); global_ast = $$;}
        ;
 
 decl_list : decl_var ';' decl_list        {$$ = newSyntaxNode (AST_SEMICOLON_DELIMITED_LIST,0,$1,$3,0,0);}
