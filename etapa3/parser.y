@@ -89,7 +89,7 @@ decl_var: type TK_IDENTIFIER '=' value                       {$$ = newSyntaxNode
         | type TK_IDENTIFIER '[' vector_range ']' inivector  {$$ = newSyntaxNode (AST_ARRAY_DECL,$2,$1,$4,$6,0);}
         ;
 
-vector_range: LIT_INTEGER                {$$ = newSyntaxNode (AST_SYMBOL,$1,0,0,0,0);}
+vector_range: LIT_INTEGER                {$$ = newSyntaxNode (AST_INTEGER,$1,0,0,0,0);}
             ;
 
 inivector: ':' value rest_inivector       {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$2,$3,0,0);}
