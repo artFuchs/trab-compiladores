@@ -148,8 +148,17 @@ void decompile (AST* node, FILE* output){
     case AST_NOT:
       fprintf (output, " not ");
       decompile (node->sons[0], output);
+      break;
     // case ast LT até AST ASSIGN é igual a acima
-
+    case AST_NO_DELIMITER_LIST:
+      decompile (node->sons[0], output);
+      decompile (node->sons[1], output);
+      break;
+    case AST_SEMICOLON_DELIMITED_LIST:
+      decompile (node->sons[0], output);
+      fprintf (output, "; ");
+      decompile (node->sons[1], output);
+      break;
     default: return;
   }
 }
