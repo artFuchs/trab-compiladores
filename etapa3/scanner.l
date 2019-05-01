@@ -64,9 +64,9 @@ XXX                                   { BEGIN(COMMENT);}
 [ \t]
 .                                     { return TOKEN_ERROR; }
 
-<STRING>\\n                           { *s++ = '\n'; }
-<STRING>\\t                           { *s++ = '\t'; }
-<STRING>\\\"                          { *s++ = '\"'; }
+<STRING>\\n                           { *s++ = '\\'; *s++ = 'n'; }
+<STRING>\\t                           { *s++ = '\\'; *s++ = 't'; }
+<STRING>\\\"                          { *s++ = '\\'; *s++ = '\"'; }
 <STRING>\"                            {
                                         *s = 0;
                                         BEGIN 0;

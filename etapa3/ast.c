@@ -86,21 +86,21 @@ void decompile (AST* node, FILE* output){
   if (node == NULL || output == NULL) return;
   switch (node->type){
     case AST_SYMBOL:
-      fprintf (output, "%s ", node->symbol->text);
+      fprintf (output, "%s", node->symbol->text);
       if (node->sons[0]){
         fprintf (output, "[ ");
-        decompile (node->sons[1], output);
+        decompile (node->sons[0], output);
         fprintf (output, " ]");
       }
       break;
     case AST_VAR_DECL:
       decompile (node->sons[0], output);
-      fprintf (output, "%s = ", node->symbol->text);
+      fprintf (output, " %s = ", node->symbol->text);
       decompile (node->sons[1], output);
       break;
     case AST_ARRAY_DECL:
       decompile (node->sons[0], output);
-      fprintf (output, "%s [ ", node->symbol->text);
+      fprintf (output, " %s [ ", node->symbol->text);
       decompile (node->sons[1], output);
       fprintf (output, " ]");
       if (node->sons[2]){
@@ -110,7 +110,7 @@ void decompile (AST* node, FILE* output){
       break;
     case AST_FUNC_DECL:
       decompile (node->sons[0], output);
-      fprintf (output, "%s ( ", node->symbol->text);
+      fprintf (output, " %s ( ", node->symbol->text);
       decompile (node->sons[1], output);
       fprintf (output, ")");
       decompile (node->sons[2], output);
@@ -149,15 +149,130 @@ void decompile (AST* node, FILE* output){
       fprintf (output, " not ");
       decompile (node->sons[0], output);
       break;
-    // case ast LT até AST ASSIGN é igual a acima
+    case AST_LT:
+      decompile (node->sons[0], output);
+      fprintf (output, " < ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_GT:
+      decompile (node->sons[0], output);
+      fprintf (output, " > ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_LE:
+      decompile (node->sons[0], output);
+      fprintf (output, " <= ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_GE:
+      decompile (node->sons[0], output);
+      fprintf (output, " >= ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_EQ:
+      decompile (node->sons[0], output);
+      fprintf (output, " == ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_DIF:
+      decompile (node->sons[0], output);
+      fprintf (output, " != ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_ASSIGN:
+      fprintf (output, "%s = ", node->symbol->text);
+      decompile (node->sons[0], output);
+      break;
+    case AST_ARRAY_ASSIGN:
+      fprintf (output, "%s [ ", node->symbol->text);
+      decompile (node->sons[0], output);
+      fprintf (output, " ] = ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_FUNC_CALL:
+      fprintf (output, "%s (", node->symbol->text);
+      decompile (node->sons[0], output);
+      fprintf (output, ")");
+      break;
+    case AST_IF:
+      fprintf (output, "if ( ");
+      decompile (node->sons[0], output);
+      fprintf (output, ") then ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_IF_ELSE:
+      fprintf (output, "if ( ");
+      decompile (node->sons[0], output);
+      fprintf (output, ") then ");
+      decompile (node->sons[1], output);
+      fprintf (output, " else ");
+      decompile (node->sons[2], output);
+      break;
+    case AST_LOOP:
+      fprintf (output, "loop ( ");
+      decompile (node->sons[0], output);
+      fprintf (output, ") ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_LEAP:
+      fprintf (output, "leap");
+      break;
     case AST_NO_DELIMITER_LIST:
+      decompile (node->sons[0], output);
+      fprintf (output, " ");
+      decompile (node->sons[1], output);
+      break;
+    case AST_COMMA_DELIMITED_LIST:
+      fprintf (output, ", ");
       decompile (node->sons[0], output);
       decompile (node->sons[1], output);
       break;
     case AST_SEMICOLON_DELIMITED_LIST:
       decompile (node->sons[0], output);
-      fprintf (output, "; ");
+      fprintf (output, "; \n");
       decompile (node->sons[1], output);
+      break;
+    case AST_PARAM_ELEM:
+      decompile (node->sons[0], output);
+      fprintf (output, " %s", node->symbol->text);
+      break;
+    case AST_PRINT:
+      fprintf (output, "print ");
+      decompile (node->sons[0], output);
+      break;
+    case AST_READ:
+      fprintf (output, "read %s ", node->symbol->text);
+      break;
+    case AST_RETURN:
+      fprintf (output, "return ");
+      decompile (node->sons[0], output);
+      break;
+    case AST_CMD_BLOCK:
+      fprintf (output, "{");
+      decompile (node->sons[0], output);
+      fprintf (output, "}");
+      break;
+    case AST_PARENTHESES:
+      fprintf (output, "(");
+      decompile (node->sons[0], output);
+      fprintf (output, ")");
+      break;
+    case AST_INTEGER:
+    case AST_FLOAT:
+    case AST_CHAR:
+      fprintf (output, "%s", node->symbol->text);
+      break;
+    case AST_STRING:
+      fprintf (output, "\"%s\"", node->symbol->text);
+      break;
+    case AST_TINT:
+      fprintf (output, "int");
+      break;
+    case AST_TFLOAT:
+      fprintf (output, "float");
+      break;
+    case AST_TBYTE:
+      fprintf (output, "byte");
       break;
     default: return;
   }
