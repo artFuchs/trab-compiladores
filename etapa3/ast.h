@@ -18,8 +18,11 @@ typedef struct syntax_node{
   struct syntax_node* sons [MAX_SONS];
 } AST;
 
+AST* global_ast;
+
 AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST* son4);
 void printNode (AST* node, int depth);
 void printTree (AST* root, int depth);
+void decompile (AST* node, FILE* output);
 
 #endif

@@ -14,23 +14,30 @@ void initMe();
 extern FILE *yyin;
 
 int main(int argc, char *argv[]){
-  if(argc < 2){
-    fprintf(stderr, "%s", "Missing file name! Command format: ./etapa2 <file_name> \n");
+  if(argc < 3){
+    fprintf(stderr, "%s", "You're wrong! Command format: ./etapa2 <input> <output> \n");
     exit(1);
   }
 
   initMe();
 
-  FILE* file = fopen(argv[1], "r");
-  if(file == NULL){
-    fprintf(stderr, "%s", "Can't open file. \n");
+  FILE* input = fopen(argv[1], "r");
+  if(!input){
+    fprintf(stderr, "%s", "Can't open input file. \n");
+    exit(1);
+  }
+  FILE* output = fopen(argv[2], "w+");
+  if(!output){
+    fprintf(stderr, "%s", "Can't open output file. \n");
     exit(1);
   }
 
-  yyin = file;
+  yyin = input;
   yyparse();
 
+
   printTable();
+  decompile(global_ast, output);
 
   return 0;
 }
