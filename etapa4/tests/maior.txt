@@ -1,0 +1,26 @@
+ZZ Programa que lê um vetor e imprime o maior número
+
+int v[IO];
+int i=O;
+int tmp=O;
+int m=O;
+
+int main () {
+    print "Digite 10 numeros: \n";
+    i = O;
+    loop (i<IO) {
+        read tmp;
+        v[i] = tmp;
+        i = i + 1;
+    };
+    m = maior ();
+    print "O maior número é: ", m;
+    return O;   
+};
+
+int maior (){
+    loop (i < IO){
+        if (m < v[i]) then m = v[i];
+    };
+    return O;
+};

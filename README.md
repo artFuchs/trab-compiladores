@@ -32,3 +32,22 @@ Fazer um analisador sintático utilizando-se das ferramentas lex e yacc. A anali
 - [X] implementar a estrutura da árvore de sintaxe, com funções de criação de nodo, impressão de um nodo e impressão da árvore;
 - [X] colocar ações sintátivas ao lado das regras de produção descritas no arquivo para o yacc, as quais criam ou propagam os nodos da árvore, montando-a recursivamente segundo a análise. A maior parte das ações serão chamadas à rotina de criação do nodo;
 - [X] implementar uma rotina que percorre a árvore e gera um programa fonte funcionalmente semelhante ao programa analisado.
+
+## Etapa 4
+Fazer uma verificação semântica, testando
+- [ ] Declarações - Devem ser verificadas as declarações. Todos os identificadores devem
+ter sido declarados, seja como variável, vetor ou como função. Os símbolos definidos
+como identificadores na tabela de símbolos devem ter seu tipo trocado para um desses
+tipos conforme a declaração, verificando-se se não houve dupla declaração ou símbolo
+não declarado;
+- [ ] Uso correto - o uso dos identificadores deve ser compatível com sua declaração.
+Variáveis somente podem ser usadas sem indexação, vetores somente podem ser
+usados com indexação, funções apenas devem ser usadas com chamada, isto é,
+seguidas da lista de argumentos entre parênteses;
+- [ ] Tipos de dados – As declarações também devem registrar os tipos de dados, em um
+novo campo, dataType, na tabela de símbolos. Com o auxílio dessa informação,
+quando necessário, os tipos de dados corretos devem ser verificados onde forem
+usados, em expressões aritméticas, relacionais, lógicas, ou para índices de vetores;
+- [ ] Argumentos e parâmetros – A lista de argumentos deve ser verificada contra a lista de
+parâmetros formais na declaração da função. Cada chamada de função deve prover um
+argumento para cada parâmetro, e ter o tipo compatível;
