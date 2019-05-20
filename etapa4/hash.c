@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-NODE *Table[HASH_SIZE];
-
 void hashInit(){
   int i;
   for (i=0; i<HASH_SIZE; i++){
@@ -45,7 +43,7 @@ NODE* hashInsert(int type, char *text){
      se o nodo não estiver no bucket, o nodo passa a apontar para
      o nodo no inicio do bucket e entra em sua posição*/
   else{
-    NODE* node = searchNode(type, text);
+    NODE* node = searchNode(text);
     if (node == NULL){
       newNode->next = Table[addr];
       Table[addr] = newNode;
@@ -56,11 +54,11 @@ NODE* hashInsert(int type, char *text){
   return newNode;
 }
 
-NODE* searchNode(int type, char*text){
+NODE* searchNode(char*text){
   int addr = hashAddress(text);
   NODE* node = Table[addr];
   while (node!=NULL){
-    if (strcmp(node->text, text)==0 && node->type == type)
+    if (strcmp(node->text, text)==0)
       break;
     else
       node = node->next;
