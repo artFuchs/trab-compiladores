@@ -1,0 +1,6 @@
+int a = O;
+int a = O;
+
+byte main(){
+    b = I;
+};
