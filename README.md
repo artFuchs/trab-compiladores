@@ -4,6 +4,7 @@ alunos: Arthur Lucena Fuchs, Matheus Westhele
 
 ## Etapa 1
 Fazer um analisador léxico utilizando-se da ferramenta lex. Ela deve:
+
 - [x] reconhecer as expressões regulares que descrevem cada tipo de lexema;
 - [x] classificar os lexemas reconhecidos em tokens retornando as constantes definidas no
 arquivo tokens.h fornecido ou códigos ascii para caracteres simples;
@@ -20,6 +21,7 @@ a 0) ao encontrar a marca de fim de arquivo;
 
 ## Etapa 2
 Fazer um analisador sintático utilizando-se das ferramentas lex e yacc. A analise sintática deve:
+
 - [X] reconhecer os programas que fazem parte da linguagem
   - funcionando com o programa de exemplo
   - [X] criar uma gramática que reconheça o programa
@@ -34,8 +36,9 @@ Fazer um analisador sintático utilizando-se das ferramentas lex e yacc. A anali
 - [X] implementar uma rotina que percorre a árvore e gera um programa fonte funcionalmente semelhante ao programa analisado.
 
 ## Etapa 4
-Fazer uma verificação semântica, testando
-- [ ] Declarações - Devem ser verificadas as declarações. Todos os identificadores devem
+Fazer uma verificação semântica, testando:
+
+ - [X] Declarações - Devem ser verificadas as declarações. Todos os identificadores devem
 ter sido declarados, seja como variável, vetor ou como função. Os símbolos definidos
 como identificadores na tabela de símbolos devem ter seu tipo trocado para um desses
 tipos conforme a declaração, verificando-se se não houve dupla declaração ou símbolo

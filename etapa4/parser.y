@@ -7,6 +7,7 @@
   #include <stdio.h>
   #include <stdlib.h>
   #include "ast.h"
+  #include "semantic.h"
   int yylex(void);
   void yyerror(char *);
   int getLineNumber();
@@ -85,8 +86,8 @@ decl_list : decl_var ';' decl_list        {$$ = newSyntaxNode (AST_SEMICOLON_DEL
           |                               {$$ = 0;}
           ;
 
-decl_var: type TK_IDENTIFIER '=' value                       {$$ = newSyntaxNode (AST_VAR_DECL,$2,$1,$4,0,0);}
-        | type TK_IDENTIFIER '[' vector_range ']' inivector  {$$ = newSyntaxNode (AST_ARRAY_DECL,$2,$1,$4,$6,0);}
+decl_var: type TK_IDENTIFIER '=' value                       {$$ = newSyntaxNode (AST_VAR_DECL,$2,$1,$4,0,0); declareSymbol($$,AST_VAR_DECL);}
+        | type TK_IDENTIFIER '[' vector_range ']' inivector  {$$ = newSyntaxNode (AST_ARRAY_DECL,$2,$1,$4,$6,0); declareSymbol($$,AST_ARRAY_DECL);}
         ;
 
 vector_range: LIT_INTEGER                {$$ = newSyntaxNode (AST_INTEGER,$1,0,0,0,0);}
@@ -100,7 +101,7 @@ rest_inivector: value rest_inivector      {$$ = newSyntaxNode (AST_NO_DELIMITER_
               |                           {$$ = 0;}
               ;
 
-decl_func: type TK_IDENTIFIER '(' param_list ')' block     {$$ = newSyntaxNode (AST_FUNC_DECL,$2,$1,$4,$6,0);}
+decl_func: type TK_IDENTIFIER '(' param_list ')' block     {$$ = newSyntaxNode (AST_FUNC_DECL,$2,$1,$4,$6,0); declareSymbol ($$, AST_FUNC_DECL);}
          ;
 
 param_list: param rest_param_list           {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$1,$2,0,0);}
@@ -111,7 +112,7 @@ rest_param_list: ',' param rest_param_list   {$$ = newSyntaxNode (AST_COMMA_DELI
            |                                 {$$ = 0;}
            ;
 
-param: type TK_IDENTIFIER                        {$$ = newSyntaxNode (AST_PARAM_ELEM,$2,$1,0,0,0);}
+param: type TK_IDENTIFIER                        {$$ = newSyntaxNode (AST_PARAM_ELEM,$2,$1,0,0,0); declareSymbol($$,AST_PARAM_ELEM);}
      ;
 
 block: '{' bl_commands '}'                        {$$ = newSyntaxNode (AST_CMD_BLOCK,0,$2,0,0,0);}

@@ -1,0 +1,15 @@
+/******************************************************
+*                                                     *
+* Autores: Arthur Lucena Fuchs e Matheus Westhelle    *
+*                                                     *
+******************************************************/
+
+#ifndef SEMANTIC_H
+#define SEMANTIC_H
+
+#include "ast.h"
+
+void declareSymbol(AST *node, int type);
+void hashCheckUndeclared();
+
+#endif

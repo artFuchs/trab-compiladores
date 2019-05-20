@@ -9,6 +9,7 @@
 #include "hash.h"
 #include "y.tab.h"
 #include "ast.h"
+#include "semantic.h"
 
 void initMe();
 extern FILE *yyin;
@@ -38,6 +39,8 @@ int main(int argc, char *argv[]){
 
   printTable();
   decompile(global_ast, output);
+
+  hashCheckUndeclared();
 
   return 0;
 }
