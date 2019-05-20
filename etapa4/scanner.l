@@ -7,6 +7,7 @@
   #include "y.tab.h"
   #include "hash.h"
   #include "ast.h"
+  #include "symbols.h"
 
   extern YYSTYPE yylval;
 
@@ -15,12 +16,6 @@
   char buf[1024];
   char *s;
 
-  #define SYMBOL_LIT_INT 1
-  #define SYMBOL_LIT_FLOAT 2
-  #define SYMBOL_LIT_BYTE 3
-  #define SYMBOL_LIT_CHAR 4
-  #define SYMBOL_LIT_STRING 5
-  #define SYMBOL_IDENTIFIER 6
 
 %}
 %x COMMENT
