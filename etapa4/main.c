@@ -41,6 +41,7 @@ int main(int argc, char *argv[]){
   decompile(global_ast, output);
 
   hashCheckUndeclared();
+  checkSymbolsUsage(global_ast);
 
   return 0;
 }
