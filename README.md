@@ -43,7 +43,7 @@ ter sido declarados, seja como variável, vetor ou como função. Os símbolos d
 como identificadores na tabela de símbolos devem ter seu tipo trocado para um desses
 tipos conforme a declaração, verificando-se se não houve dupla declaração ou símbolo
 não declarado;
-- [ ] Uso correto - o uso dos identificadores deve ser compatível com sua declaração.
+- [X] Uso correto - o uso dos identificadores deve ser compatível com sua declaração.
 Variáveis somente podem ser usadas sem indexação, vetores somente podem ser
 usados com indexação, funções apenas devem ser usadas com chamada, isto é,
 seguidas da lista de argumentos entre parênteses;
