@@ -9,14 +9,24 @@ void printError(char *msg, char *type, char *varName);
 void declareSymbol(AST *node, int type){
   if (node->symbol->type == SYMBOL_FUNC){
     if (node->sons[0]->symbol->type != SYMBOL_IDENTIFIER){
-      fprintf (stderr,"semantic error: param %s redeclared\n", node->sons[0]->symbol->text);
-      //TODO: informar erro semantico
+      printError("symbol redeclared","param", node->symbol->text);
       return;
     }
   }
   else if (node->symbol->type != SYMBOL_IDENTIFIER){
     fprintf (stderr,"semantic error: variable %s redeclared\n", node->symbol->text);
-    //TODO: informar erro semantico
+    switch (node->symbol->type){
+      case SYMBOL_VAR:
+        printError("symbol redeclared","variable", node->symbol->text);
+        break;
+      case SYMBOL_ARRAY:
+        printError("symbol redeclared","array", node->symbol->text);
+        break;
+      case SYMBOL_FUNC:
+        printError("symbol redeclared","function", node->symbol->text);
+        break;
+    }
+
     return;
   }
 
@@ -46,7 +56,7 @@ void hashCheckUndeclared(){
     NODE *node;
     for (node = Table[i]; node; node=node->next){
       if (node->type == SYMBOL_IDENTIFIER){
-        fprintf (stderr, "semantic error: var %s not declared\n", node->text);
+        printError("symbol not declared","", node->text);
       }
     }
   }
@@ -59,22 +69,22 @@ void checkSymbolsUsage(AST *node){
     case AST_SYMBOL:
       if (node->symbol->type == SYMBOL_VAR){
         if (node->sons[0]){
-          fprintf(stderr, "semantic error: var %s being indexed\n", node->symbol->text);
+          printError("trying to index a variable","variable", node->symbol->text);
         }
       }
       else if (node->symbol->type == SYMBOL_ARRAY){
         if (node->sons[0]==0)
-          fprintf(stderr, "semantic error: array %s not being indexed\n", node->symbol->text );
+          printError("array not being indexed", "array", node->symbol->text );
         else
           checkSymbolsUsage(node->sons[0]);
       }
       else if (node->symbol->type == SYMBOL_FUNC){
-        fprintf(stderr, "semantic error: trying to use function %s as a variable\n", node->symbol->text);
+        printError("trying to use function as variable", "function", node->symbol->text);
       }
       break;
     case AST_FUNC_CALL:
       if (node->symbol->type != SYMBOL_FUNC)
-        fprintf(stderr, "semantic error: variable %s being used as function\n", node->symbol->text);
+        printError("variable being used as function", "variable", node->symbol->text);
       checkSymbolsUsage(node->sons[0]);
       break;
     case AST_ADD:
@@ -97,15 +107,14 @@ void checkSymbolsUsage(AST *node){
       break;
     case AST_ASSIGN:
       if (node->symbol->type == SYMBOL_ARRAY){
-        fprintf(stderr, "semantic error: array %s not being indexed\n", node->symbol->text);
+        printError("array not being indexed\n", "array", node->symbol->text);
       }else if (node->symbol->type == SYMBOL_FUNC){
-        fprintf(stderr, "semantic error: trying to assign a value to the function %s\n", node->symbol->text);
+        printError("trying to assign value to a function", "function", node->symbol->text);
       }
       checkSymbolsUsage(node->sons[0]);
       break;
     case AST_ARRAY_ASSIGN:
       if (node->symbol->type == SYMBOL_VAR){
-        //fprintf(stderr, "semantic error: variable %s being indexed \n", node->symbol->text);
         printError("variable being indexed", "var", node->symbol->text);
       }
       else if (node->symbol->type == SYMBOL_FUNC){
@@ -115,28 +124,47 @@ void checkSymbolsUsage(AST *node){
       checkSymbolsUsage(node->sons[1]);
       break;
     case AST_IF:
+      checkSymbolsUsage(node->sons[0]);
+      checkSymbolsUsage(node->sons[1]);
+      break;
     case AST_IF_ELSE:
+      checkSymbolsUsage(node->sons[0]);
+      checkSymbolsUsage(node->sons[1]);
+      checkSymbolsUsage(node->sons[2]);
+      break;
     case AST_LOOP:
+      checkSymbolsUsage(node->sons[0]);
+      checkSymbolsUsage(node->sons[1]);
       break;
     case AST_NO_DELIMITER_LIST:
-      //fprintf(stderr, "passando por uma lista sem delimitadores \n");
       checkSymbolsUsage(node->sons[0]);
       checkSymbolsUsage(node->sons[1]);
       break;
     case AST_COMMA_DELIMITED_LIST:
-      //fprintf(stderr, "passando por uma lista separada por , \n");
       checkSymbolsUsage(node->sons[0]);
       checkSymbolsUsage(node->sons[1]);
       break;
     case AST_SEMICOLON_DELIMITED_LIST:
-      //fprintf(stderr, "passando por uma lista separada por ; \n");
       checkSymbolsUsage(node->sons[0]);
       checkSymbolsUsage(node->sons[1]);
       break;
+    case AST_READ:
+      if (node->symbol->type != SYMBOL_VAR){
+        char *msg = "invalid argument to the keyword READ";
+        switch (node->symbol->type){
+          case SYMBOL_FUNC:
+            printError(msg,"function",node->symbol->text);
+          case SYMBOL_ARRAY:
+            printError(msg,"array",node->symbol->text);
+          default:
+            printError(msg,"unknown symbol",node->symbol->text);
+        }
+      }
+      break;
+    case AST_PRINT:
     case AST_RETURN:
     case AST_CMD_BLOCK:
     case AST_PARENTHESES:
-      //fprintf(stderr, "passando por return, block ou parenteses\n");
       checkSymbolsUsage(node->sons[0]);
       break;
     case AST_FUNC_DECL:
