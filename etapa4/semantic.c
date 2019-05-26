@@ -5,6 +5,7 @@
 #include <stdlib.h>
 
 void printError(char *msg, char *type, char *varName);
+int getFunctionCallParamCount(AST *node);
 
 void declareSymbol(AST *node, int type){
   if (node->symbol->type == SYMBOL_FUNC){
@@ -33,18 +34,23 @@ void declareSymbol(AST *node, int type){
   switch (type){
     case AST_PARAM_ELEM:
       node->symbol->type = SYMBOL_VAR;
+      node->symbol->n_params=0;
       // TODO: setar tipo do parametro
       break;
     case AST_VAR_DECL:
       node->symbol->type = SYMBOL_VAR;
+      node->symbol->n_params=0;
       // TODO: setar tipo da variavel
       break;
     case AST_ARRAY_DECL:
       node->symbol->type = SYMBOL_ARRAY;
+      node->symbol->n_params=0;
       // TODO: setar tipo do array
       break;
     case AST_FUNC_DECL:
       node->symbol->type = SYMBOL_FUNC;
+      node->symbol->n_params=getFunctionCallParamCount(node->sons[1]);
+      printf("function %s has %d params\n", node->symbol->text, node->symbol->n_params);
       // TODO: setar tipo de retorno da função
       break;
   }
@@ -171,6 +177,31 @@ void checkSymbolsUsage(AST *node){
       checkSymbolsUsage(node->sons[2]);
   }
   return;
+}
+
+void checkFunctionCallParams(AST *node){
+  if (!node) return;
+  if (node->type==AST_FUNC_CALL){
+    int count = getFunctionCallParamCount(node->sons[0]);
+    if (count!=node->symbol->n_params){
+      printError("wrong number of params in function call", "function", node->symbol->text);
+      fprintf(stderr, "expected: %d / got: %d\n", node->symbol->n_params, count);
+    }
+  }
+  int i;
+  for (i=0;i<MAX_SONS;i++){
+    checkFunctionCallParams(node->sons[i]);
+  }
+}
+
+int getFunctionCallParamCount(AST *node){
+  if (!node) return 0;
+  int count=0;
+  while (node){
+    node = node->sons[1];
+    count++;
+  }
+  return count;
 }
 
 void printError(char *msg, char *type, char *varName){

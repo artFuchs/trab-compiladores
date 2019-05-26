@@ -12,5 +12,5 @@
 void declareSymbol(AST *node, int type);
 void hashCheckUndeclared();
 void checkSymbolsUsage(AST *node);
-
+void checkFunctionCallParams(AST *node);
 #endif
