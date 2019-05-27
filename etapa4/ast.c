@@ -42,7 +42,7 @@ void printNode (AST* node, int depth){
     case AST_LE: printf("AST_LE"); break;
     case AST_GE: printf("AST_GE"); break;
     case AST_EQ: printf("AST_EQ"); break;
-    case AST_DIF: printf("AST_DIF"); break;
+    case AST_NEQ: printf("AST_NEQ"); break;
     case AST_ASSIGN: printf("AST_ASSIGN"); break;
     case AST_ARRAY_ASSIGN: printf("AST_ARRAY_ASSIGN"); break;
     case AST_FUNC_CALL: printf("AST_FUNC_CALL"); break;
@@ -174,7 +174,7 @@ void decompile (AST* node, FILE* output){
       fprintf (output, " == ");
       decompile (node->sons[1], output);
       break;
-    case AST_DIF:
+    case AST_NEQ:
       decompile (node->sons[0], output);
       fprintf (output, " != ");
       decompile (node->sons[1], output);

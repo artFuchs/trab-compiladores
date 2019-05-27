@@ -116,7 +116,7 @@ void checkSymbolsUsage(AST *node) {
     case AST_LE:
     case AST_GE:
     case AST_EQ:
-    case AST_DIF:
+    case AST_NEQ:
       checkSymbolsUsage(node->sons[0]);
       checkSymbolsUsage(node->sons[1]);
       break;
@@ -189,6 +189,34 @@ void checkSymbolsUsage(AST *node) {
       checkSymbolsUsage(node->sons[2]);
   }
   return;
+}
+
+void checkDataType(AST *node) {
+  if (node == NULL) return;
+
+  for (int i=0; i < MAX_SONS; i++) {
+    checkDataType(node->sons[i]);
+  }
+
+  switch (node->type) {
+    case AST_ASSIGN:
+      if (node->sons[0]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't assign undefined expression", "assignment", node->sons[0]->symbol->text);
+      }
+      if (node->symbol->dataType != node->sons[0]->dataType) {
+        printError("Type conflict on assignment", "assignment", node->symbol->text);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = node->symbol->dataType;
+      }
+      break;
+    case AST_ADD:
+    case AST_SUB:
+    case AST_MUL:
+    case AST_DIV:
+    //TODO: complete this
+  }
 }
 
 void printError(char *msg, char *type, char *varName){
