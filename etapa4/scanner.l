@@ -8,6 +8,7 @@
   #include "hash.h"
   #include "ast.h"
   #include "symbols.h"
+  #include "types.h"
 
   extern YYSTYPE yylval;
 
@@ -51,10 +52,10 @@ XXX                                   { BEGIN(COMMENT);}
 "and"                                 { return OPERATOR_AND; }
 "or"                                  { return OPERATOR_OR; }
 "not"                                 { return OPERATOR_NOT; }
-[a-z0-9_]+                            { yylval.symbol = hashInsert(SYMBOL_IDENTIFIER, yytext); return TK_IDENTIFIER; }
-[OIHGFEDCBA]+                         { yylval.symbol = hashInsert(SYMBOL_LIT_INT, yytext); return LIT_INTEGER; }
-[OIHGFEDCBA]+\.[OIHGFEDCBA]+          { yylval.symbol = hashInsert(SYMBOL_LIT_FLOAT, yytext); return LIT_FLOAT; }
-\'.\'                                 { yylval.symbol = hashInsert(SYMBOL_LIT_CHAR, yytext); return LIT_CHAR; }
+[a-z0-9_]+                            { yylval.symbol = hashInsert(SYMBOL_IDENTIFIER, DATATYPE_UNDEFINED, yytext); return TK_IDENTIFIER; }
+[OIHGFEDCBA]+                         { yylval.symbol = hashInsert(SYMBOL_LIT_INT, DATATYPE_INT, yytext); return LIT_INTEGER; }
+[OIHGFEDCBA]+\.[OIHGFEDCBA]+          { yylval.symbol = hashInsert(SYMBOL_LIT_FLOAT, DATATYPE_FLOAT, yytext); return LIT_FLOAT; }
+\'.\'                                 { yylval.symbol = hashInsert(SYMBOL_LIT_CHAR, DATATYPE_CHAR, yytext); return LIT_CHAR; }
 \"                                    { BEGIN(STRING); s = buf; }
 [ \t]
 .                                     { return TOKEN_ERROR; }
@@ -65,7 +66,7 @@ XXX                                   { BEGIN(COMMENT);}
 <STRING>\"                            {
                                         *s = 0;
                                         BEGIN 0;
-                                        yylval.symbol = hashInsert(SYMBOL_LIT_STRING, buf);
+                                        yylval.symbol = hashInsert(SYMBOL_LIT_STRING, DATATYPE_STRING, buf);
                                         return LIT_STRING;
                                       }
 <STRING>\n                            { printf("string invalida"); lineNumber++; return TOKEN_ERROR; }

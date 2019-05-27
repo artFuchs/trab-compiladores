@@ -1,19 +1,20 @@
 #include "semantic.h"
 #include "hash.h"
 #include "symbols.h"
+#include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 void printError(char *msg, char *type, char *varName);
 
-void declareSymbol(AST *node, int type){
+void declareSymbol(AST *node, int type) {
   if (node->symbol->type == SYMBOL_FUNC){
     if (node->sons[0]->symbol->type != SYMBOL_IDENTIFIER){
       printError("symbol redeclared","param", node->symbol->text);
       return;
     }
   }
-  else if (node->symbol->type != SYMBOL_IDENTIFIER){
+  else if (node->symbol->type != SYMBOL_IDENTIFIER) {
     fprintf (stderr,"semantic error: variable %s redeclared\n", node->symbol->text);
     switch (node->symbol->type){
       case SYMBOL_VAR:
@@ -33,24 +34,41 @@ void declareSymbol(AST *node, int type){
   switch (type){
     case AST_PARAM_ELEM:
       node->symbol->type = SYMBOL_VAR;
-      // TODO: setar tipo do parametro
+      setDataType(node, node->sons[0]->type);
       break;
     case AST_VAR_DECL:
       node->symbol->type = SYMBOL_VAR;
-      // TODO: setar tipo da variavel
+      setDataType(node, node->sons[0]->type);
       break;
     case AST_ARRAY_DECL:
       node->symbol->type = SYMBOL_ARRAY;
-      // TODO: setar tipo do array
+			setDataType(node, node->sons[0]->sons[0]->type);
       break;
     case AST_FUNC_DECL:
       node->symbol->type = SYMBOL_FUNC;
-      // TODO: setar tipo de retorno da função
+			setDataType(node->sons[0], node->sons[0]->sons[0]->type);
       break;
   }
 }
 
-void hashCheckUndeclared(){
+void setDataType(AST *node, int type) {
+  switch (type) {
+    case AST_INTEGER:
+      node->symbol->type = DATATYPE_INT;
+      break;
+    case AST_FLOAT:
+      node->symbol->type = DATATYPE_FLOAT;
+      break;
+    case AST_TBYTE:
+      node->symbol->type = DATATYPE_BYTE;
+      break;
+    default:
+      node->symbol->type = DATATYPE_UNDEFINED;
+  }
+  node->dataType = node->symbol->dataType;
+}
+
+void hashCheckUndeclared() {
   int i;
   for (i=0; i<HASH_SIZE; i++){
     NODE *node;
@@ -63,22 +81,22 @@ void hashCheckUndeclared(){
   return;
 }
 
-void checkSymbolsUsage(AST *node){
+void checkSymbolsUsage(AST *node) {
   if (node == 0) return;
   switch (node->type) {
     case AST_SYMBOL:
-      if (node->symbol->type == SYMBOL_VAR){
+      if (node->symbol->type == SYMBOL_VAR) {
         if (node->sons[0]){
           printError("trying to index a variable","variable", node->symbol->text);
         }
       }
-      else if (node->symbol->type == SYMBOL_ARRAY){
+      else if (node->symbol->type == SYMBOL_ARRAY) {
         if (node->sons[0]==0)
           printError("array not being indexed", "array", node->symbol->text );
         else
           checkSymbolsUsage(node->sons[0]);
       }
-      else if (node->symbol->type == SYMBOL_FUNC){
+      else if (node->symbol->type == SYMBOL_FUNC) {
         printError("trying to use function as variable", "function", node->symbol->text);
       }
       break;

@@ -5,6 +5,7 @@
 ******************************************************/
 
 #include "hash.h"
+#include "types.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -25,10 +26,11 @@ int hashAddress(char* text){
   return addr - 1;
 }
 
-NODE* hashInsert(int type, char *text){
+NODE* hashInsert(int type, int dataType, char *text){
   NODE* newNode;
   newNode = calloc(1, sizeof(NODE));
   memcpy(&newNode->type,&type,sizeof(int));
+  newNode->dataType = DATATYPE_UNDEFINED;
   newNode->text = calloc(strlen(text)+1, sizeof(char));
   strcpy(newNode->text, text);
 
