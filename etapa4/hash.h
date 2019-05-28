@@ -13,6 +13,7 @@ typedef struct node{
   int type;
   int dataType;
   char *text;
+  int n_params;
   struct node *next;
 } NODE;
 

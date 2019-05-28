@@ -14,5 +14,5 @@ void hashCheckUndeclared();
 void checkSymbolsUsage(AST *node);
 void setDataType(AST *node, int type);
 void checkDataType(AST *node);
-
+void checkFunctionCallParams(AST *node);
 #endif

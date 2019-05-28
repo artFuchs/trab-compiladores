@@ -75,7 +75,7 @@ void printTable(){
       printf("%d: {%d,%d,%s}\n", i, Table[i]->type, Table[i]->dataType, Table[i]->text);
       NODE* node = Table[i]->next;
       while (node!=NULL){
-        printf("-- {%d,%d,%s}\n", Table[i]->type, Table[i]->dataType, Table[i]->text);
+        printf("-- {%d,%d,%s}\n", node->type, node->dataType, node->text);
         node = node->next;
       }
     }
