@@ -92,7 +92,7 @@ void checkSymbolsUsage(AST *node) {
       }
       else if (node->symbol->type == SYMBOL_ARRAY) {
         if (node->sons[0]==0)
-          printError("array not being indexed", "array", node->symbol->text );
+          printError("array not being indexed", "array", node->symbol->text);
         else
           checkSymbolsUsage(node->sons[0]);
       }
@@ -255,6 +255,30 @@ void checkDataType(AST *node) {
         node->dataType = DATATYPE_BOOL;
       }
       break;
+    case AST_AND:
+    case AST_OR:
+			if (node->sons[0]->dataType != DATATYPE_BOOL || node->sons[1]->dataType != DATATYPE_BOOL) {
+        printError("Expected boolean expressions", "logic expr", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
+        printError("Unexpected undefined expression", "logic expr", NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+    case AST_NOT:
+      if (node->sons[0]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't negate an undefined expression", "negation", node->sons[0]->symbol->text);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->sons[0]->dataType != DATATYPE_BOOL) {
+        printError("Can't negate something that's not a boolean expression", "negation", node->sons[0]->symbol->text);
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+      break;
     case AST_ADD:
     case AST_SUB:
     case AST_MUL:
@@ -265,5 +289,9 @@ void checkDataType(AST *node) {
 }
 
 void printError(char *msg, char *type, char *varName){
-  fprintf(stderr, "semantic error: %s, %s %s\n", msg, type, varName);
+  if (varName) {
+    fprintf(stderr, "semantic error: %s, %s %s\n", msg, type, varName);
+  }
+  else
+    fprintf(stderr, "semantic error: %s, %s\n", msg, type);
 }
