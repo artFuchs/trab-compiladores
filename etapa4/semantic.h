@@ -9,6 +9,7 @@
 
 #include "ast.h"
 
+int fullSemanticCheck(AST *node);
 void declareSymbol(AST *node, int type);
 void hashCheckUndeclared();
 void checkSymbolsUsage(AST *node);

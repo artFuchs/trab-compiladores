@@ -32,6 +32,7 @@ NODE* hashInsert(int type, int dataType, char *text){
   newNode->type = type;
   newNode->dataType = dataType;
   newNode->text = calloc(strlen(text)+1, sizeof(char));
+  newNode->ast_link = NULL;
   strcpy(newNode->text, text);
 
   // procurar o bucket dado pelo endereço

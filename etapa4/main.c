@@ -40,12 +40,9 @@ int main(int argc, char *argv[]){
   printTable();
   decompile(global_ast, output);
 
-  printf("checking undeclared symbols in the hash...\n");
-  hashCheckUndeclared();
-  printf("checking symbol's usage...\n");
-  checkSymbolsUsage(global_ast);
-  checkDataType(global_ast);
-  checkFunctionCallParams(global_ast);
+  int errors = 0;
+  errors = fullSemanticCheck(global_ast);
+  if (errors) return 4;
 
   return 0;
 }

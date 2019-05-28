@@ -15,13 +15,13 @@
 typedef struct syntax_node{
   int type;
   int dataType;
-  NODE* symbol; // case type == LIT or IDENTIFIER
-  struct syntax_node* sons [MAX_SONS];
+  struct node *symbol; // case type == LIT or IDENTIFIER
+  struct syntax_node *sons [MAX_SONS];
 } AST;
 
 AST* global_ast;
 
-AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST* son4);
+AST* newSyntaxNode (int type, struct node* symbol, AST* son1, AST* son2, AST* son3, AST* son4);
 void printNode (AST* node, int depth);
 void printTree (AST* root, int depth);
 void decompile (AST* node, FILE* output);

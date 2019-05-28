@@ -8,6 +8,22 @@
 void printError(char *msg, char *type, char *varName);
 int getFunctionCallParamCount(AST *node);
 int typeInference(int, int);
+void compareFunctionParams(AST*, AST*);
+
+int semantic_errors;
+
+int fullSemanticCheck(AST *node){
+  semantic_errors = 0;
+  printf("checking undeclared symbols in the hash...\n");
+  hashCheckUndeclared();
+  printf("checking symbol's usage...\n");
+  checkSymbolsUsage(global_ast);
+  printf("checking types...\n");
+  checkDataType(global_ast);
+  printf("checking function arguments...\n");
+  checkFunctionCallParams(global_ast);
+  return semantic_errors;
+}
 
 void declareSymbol(AST *node, int type) {
   if (node->symbol->type == SYMBOL_FUNC){
@@ -17,7 +33,7 @@ void declareSymbol(AST *node, int type) {
     }
   }
   else if (node->symbol->type != SYMBOL_IDENTIFIER) {
-    fprintf (stderr,"semantic error: variable %s redeclared\n", node->symbol->text);
+    printError("symbol redeclared", "symbol", node->symbol->text);
     switch (node->symbol->type){
       case SYMBOL_VAR:
         printError("symbol redeclared","variable", node->symbol->text);
@@ -53,6 +69,7 @@ void declareSymbol(AST *node, int type) {
       node->symbol->type = SYMBOL_FUNC;
 			setDataType(node, node->sons[0]->type);
       node->symbol->n_params=getFunctionCallParamCount(node->sons[1]);
+      node->symbol->ast_link=node;
       printf("function %s has %d params\n", node->symbol->text, node->symbol->n_params);
 
       break;
@@ -176,15 +193,7 @@ void checkSymbolsUsage(AST *node) {
       break;
     case AST_READ:
       if (node->symbol->type != SYMBOL_VAR){
-        char *msg = "invalid argument to the keyword READ";
-        switch (node->symbol->type){
-          case SYMBOL_FUNC:
-            printError(msg,"function",node->symbol->text);
-          case SYMBOL_ARRAY:
-            printError(msg,"array",node->symbol->text);
-          default:
-            printError(msg,"unknown symbol",node->symbol->text);
-        }
+        printError("invalid argument to the keyword READ", node->symbol->text, NULL);
       }
       break;
     case AST_PRINT:
@@ -209,7 +218,7 @@ void checkDataType(AST *node) {
 
   switch (node->type) {
     case AST_SYMBOL:
-      if (node->symbol->type == SYMBOL_ARRAY) {
+      if (node->symbol->type == SYMBOL_ARRAY && node->sons[1]==0) {
         printError("Invalid use of array", "symbol", node->symbol->text);
         node->dataType = DATATYPE_UNDEFINED;
       }
@@ -266,7 +275,7 @@ void checkDataType(AST *node) {
       break;
     case AST_AND:
     case AST_OR:
-			if (node->sons[0]->dataType != DATATYPE_BOOL || node->sons[1]->dataType != DATATYPE_BOOL) {
+      if (node->sons[0]->dataType != DATATYPE_BOOL || node->sons[1]->dataType != DATATYPE_BOOL) {
         printError("Expected boolean expressions", "logic expr", NULL);
       }
       else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
@@ -308,6 +317,18 @@ void checkDataType(AST *node) {
         node->dataType = typeInference(node->sons[0]->dataType, node->sons[1]->dataType);
       }
       break;
+    case AST_INTEGER:
+      node->dataType = DATATYPE_INT;
+      break;
+    case AST_FLOAT:
+      node->dataType = DATATYPE_FLOAT;
+      break;
+    case AST_CHAR:
+      node->dataType = DATATYPE_CHAR;
+      break;
+    case AST_STRING:
+      node->dataType = DATATYPE_STRING;
+      break;
     //TODO: complete this
   }
 }
@@ -339,6 +360,7 @@ void checkFunctionCallParams(AST *node){
       printError("wrong number of params in function call", "function", node->symbol->text);
       fprintf(stderr, "expected: %d / got: %d\n", node->symbol->n_params, count);
     }
+    compareFunctionParams(node->sons[1],node->symbol->ast_link->sons[1]);
   }
   int i;
   for (i=0;i<MAX_SONS;i++){
@@ -356,7 +378,17 @@ int getFunctionCallParamCount(AST *node){
   return count;
 }
 
+void compareFunctionParams(AST *node, AST *original_node){
+  if (!node) return;
+  if (!original_node) return;
+  if (node->symbol->dataType != original_node->symbol->dataType){
+    printError("param type does not mathc with the requested type", node->symbol->text, original_node->symbol->text);
+  }
+  compareFunctionParams(node->sons[1], original_node->sons[1]);
+}
+
 void printError(char *msg, char *type, char *varName){
+  semantic_errors+=1;
   if (varName) {
     fprintf(stderr, "semantic error: %s, %s %s\n", msg, type, varName);
   }

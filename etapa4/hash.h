@@ -8,12 +8,14 @@
 #define HASH_H
 
 #define HASH_SIZE 1024
+#include "ast.h"
 
 typedef struct node{
   int type;
   int dataType;
   char *text;
   int n_params;
+  struct syntax_node *ast_link;
   struct node *next;
 } NODE;
 
