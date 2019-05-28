@@ -199,6 +199,19 @@ void checkDataType(AST *node) {
   }
 
   switch (node->type) {
+    case AST_SYMBOL:
+      if (node->symbol->type == SYMBOL_ARRAY) {
+        printError("Invalid use of array", "symbol", node->symbol->text);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->symbol->type == SYMBOL_FUNC) {
+        printError("Invalid use of function", "symbol", node->symbol->text); 
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = node->symbol->dataType;
+      }
+      break;
     case AST_ASSIGN:
       if (node->sons[0]->dataType == DATATYPE_UNDEFINED) {
         printError("Can't assign undefined expression", "assignment", node->sons[0]->symbol->text);
@@ -211,11 +224,42 @@ void checkDataType(AST *node) {
         node->dataType = node->symbol->dataType;
       }
       break;
+    case AST_LT:
+    case AST_LE:
+    case AST_GT:
+    case AST_GE: 
+      if (node->sons[0]->dataType == DATATYPE_BOOL || node->sons[1]->dataType == DATATYPE_BOOL) {
+        printError("Can't compare boolean expression", "comparison", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't compare undefined expressions", "comparison", NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+      break;
+    case AST_EQ:
+    case AST_NEQ:
+      if (node->sons[0]->dataType == DATATYPE_BOOL || node->sons[1]->dataType == DATATYPE_BOOL) {
+        printError("Can't compare booleans", "equality", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_STRING || node->sons[1]->dataType == DATATYPE_STRING) {
+        printError("Can't compare strings", "equality", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't compare undefined expressions", "equality", NULL); 
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+      break;
     case AST_ADD:
     case AST_SUB:
     case AST_MUL:
     case AST_DIV:
-      break;
+    break;
     //TODO: complete this
   }
 }
