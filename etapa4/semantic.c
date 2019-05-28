@@ -46,24 +46,24 @@ void declareSymbol(AST *node, int type) {
       break;
     case AST_FUNC_DECL:
       node->symbol->type = SYMBOL_FUNC;
-			setDataType(node->sons[0], node->sons[0]->sons[0]->type);
+			setDataType(node, node->sons[0]->type);
       break;
   }
 }
 
 void setDataType(AST *node, int type) {
   switch (type) {
-    case AST_INTEGER:
-      node->symbol->type = DATATYPE_INT;
+    case AST_TINT:
+      node->symbol->dataType = DATATYPE_INT;
       break;
-    case AST_FLOAT:
-      node->symbol->type = DATATYPE_FLOAT;
+    case AST_TFLOAT:
+      node->symbol->dataType = DATATYPE_FLOAT;
       break;
     case AST_TBYTE:
-      node->symbol->type = DATATYPE_BYTE;
+      node->symbol->dataType = DATATYPE_BYTE;
       break;
     default:
-      node->symbol->type = DATATYPE_UNDEFINED;
+      node->symbol->dataType = DATATYPE_UNDEFINED;
   }
   node->dataType = node->symbol->dataType;
 }
@@ -215,6 +215,7 @@ void checkDataType(AST *node) {
     case AST_SUB:
     case AST_MUL:
     case AST_DIV:
+      break;
     //TODO: complete this
   }
 }

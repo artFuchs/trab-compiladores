@@ -29,8 +29,8 @@ int hashAddress(char* text){
 NODE* hashInsert(int type, int dataType, char *text){
   NODE* newNode;
   newNode = calloc(1, sizeof(NODE));
-  memcpy(&newNode->type,&type,sizeof(int));
-  newNode->dataType = DATATYPE_UNDEFINED;
+  newNode->type = type;
+  newNode->dataType = dataType;
   newNode->text = calloc(strlen(text)+1, sizeof(char));
   strcpy(newNode->text, text);
 
@@ -72,10 +72,10 @@ void printTable(){
   int i=0;
   for (i=0; i<HASH_SIZE; i++){
     if (Table[i]!=NULL){
-      printf("%d: {%d,%s}\n", i, Table[i]->type, Table[i]->text);
+      printf("%d: {%d,%d,%s}\n", i, Table[i]->type, Table[i]->dataType, Table[i]->text);
       NODE* node = Table[i]->next;
       while (node!=NULL){
-        printf("-- {%d,%s}\n", node->type, node->text);
+        printf("-- {%d,%d,%s}\n", Table[i]->type, Table[i]->dataType, Table[i]->text);
         node = node->next;
       }
     }
