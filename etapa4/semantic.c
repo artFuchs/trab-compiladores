@@ -6,6 +6,7 @@
 #include <stdlib.h>
 
 void printError(char *msg, char *type, char *varName);
+int typeInference(int, int);
 
 void declareSymbol(AST *node, int type) {
   if (node->symbol->type == SYMBOL_FUNC){
@@ -42,7 +43,7 @@ void declareSymbol(AST *node, int type) {
       break;
     case AST_ARRAY_DECL:
       node->symbol->type = SYMBOL_ARRAY;
-			setDataType(node, node->sons[0]->sons[0]->type);
+			setDataType(node, node->sons[0]->type);
       break;
     case AST_FUNC_DECL:
       node->symbol->type = SYMBOL_FUNC;
@@ -205,7 +206,7 @@ void checkDataType(AST *node) {
         node->dataType = DATATYPE_UNDEFINED;
       }
       else if (node->symbol->type == SYMBOL_FUNC) {
-        printError("Invalid use of function", "symbol", node->symbol->text); 
+        printError("Invalid use of function", "symbol", node->symbol->text);
         node->dataType = DATATYPE_UNDEFINED;
       }
       else {
@@ -214,7 +215,7 @@ void checkDataType(AST *node) {
       break;
     case AST_ASSIGN:
       if (node->sons[0]->dataType == DATATYPE_UNDEFINED) {
-        printError("Can't assign undefined expression", "assignment", node->sons[0]->symbol->text);
+        printError("Can't assign undefined expression", "assignment", node->symbol->text);
       }
       if (node->symbol->dataType != node->sons[0]->dataType) {
         printError("Type conflict on assignment", "assignment", node->symbol->text);
@@ -227,7 +228,7 @@ void checkDataType(AST *node) {
     case AST_LT:
     case AST_LE:
     case AST_GT:
-    case AST_GE: 
+    case AST_GE:
       if (node->sons[0]->dataType == DATATYPE_BOOL || node->sons[1]->dataType == DATATYPE_BOOL) {
         printError("Can't compare boolean expression", "comparison", NULL);
       }
@@ -248,7 +249,7 @@ void checkDataType(AST *node) {
         printError("Can't compare strings", "equality", NULL);
       }
       else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
-        printError("Can't compare undefined expressions", "equality", NULL); 
+        printError("Can't compare undefined expressions", "equality", NULL);
         node->dataType = DATATYPE_UNDEFINED;
       }
       else {
@@ -283,9 +284,43 @@ void checkDataType(AST *node) {
     case AST_SUB:
     case AST_MUL:
     case AST_DIV:
-    break;
+      if (node->sons[0]->dataType==DATATYPE_BOOL || node->sons[1]->dataType==DATATYPE_BOOL){
+        printError("expressão booleana não esperada em expressão aritmetica", NULL, NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->sons[0]->dataType==DATATYPE_UNDEFINED || node->sons[1]->dataType==DATATYPE_UNDEFINED){
+        printError("impossivel inferir tipo da expressão aritmética", NULL, NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->sons[0]->dataType==DATATYPE_STRING || node->sons[1]->dataType==DATATYPE_STRING){
+        printError("string não esperada em expressão aritmética", NULL, NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else{
+        node->dataType = typeInference(node->sons[0]->dataType, node->sons[1]->dataType);
+      }
+      break;
     //TODO: complete this
   }
+}
+
+int typeInference(int type1, int type2){
+  if (type1 == DATATYPE_FLOAT || type2 == DATATYPE_FLOAT){
+    return DATATYPE_FLOAT;
+  }
+  else if (type1 == DATATYPE_INT || type2 == DATATYPE_INT){
+    return DATATYPE_INT;
+  }
+  else if (type1 == DATATYPE_BYTE || type2 == DATATYPE_BYTE){
+    return DATATYPE_BYTE;
+  }
+  else if (type1 == DATATYPE_CHAR || type2 == DATATYPE_CHAR){
+    return DATATYPE_CHAR;
+  }
+  else{
+    return DATATYPE_UNDEFINED;
+  }
+  return DATATYPE_UNDEFINED;
 }
 
 void printError(char *msg, char *type, char *varName){

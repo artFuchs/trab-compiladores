@@ -42,6 +42,7 @@ int main(int argc, char *argv[]){
 
   hashCheckUndeclared();
   checkSymbolsUsage(global_ast);
+  checkDataType(global_ast);
 
   return 0;
 }
