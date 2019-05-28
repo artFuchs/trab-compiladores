@@ -218,7 +218,7 @@ void checkDataType(AST *node) {
 
   switch (node->type) {
     case AST_SYMBOL:
-      if (node->symbol->type == SYMBOL_ARRAY && node->sons[1]==0) {
+      if (node->symbol->type == SYMBOL_ARRAY && node->sons[0]==0) {
         printError("Invalid use of array", "symbol", node->symbol->text);
         node->dataType = DATATYPE_UNDEFINED;
       }
