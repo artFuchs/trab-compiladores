@@ -14,6 +14,7 @@
 
 typedef struct syntax_node{
   int type;
+  int dataType;
   NODE* symbol; // case type == LIT or IDENTIFIER
   struct syntax_node* sons [MAX_SONS];
 } AST;

@@ -27,7 +27,7 @@
 #define AST_LE 25
 #define AST_GE 26
 #define AST_EQ 27
-#define AST_DIF 28
+#define AST_NEQ 28
 
 #define AST_ASSIGN 30
 #define AST_ARRAY_ASSIGN 31

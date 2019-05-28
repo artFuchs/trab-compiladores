@@ -11,7 +11,9 @@
 
 typedef struct node{
   int type;
+  int dataType;
   char *text;
+  int n_params;
   struct node *next;
 } NODE;
 
@@ -19,7 +21,7 @@ NODE *Table[HASH_SIZE];
 
 void hashInit(); // inicializa a tabela hash
 int hashAddress(char *text); // cria um endereço para uma entrada na tabela
-NODE* hashInsert(int type, char *text);
+NODE* hashInsert(int type, int dataType, char *text);
 NODE* searchNode(char *text); // procura uma entrada na tabela
 void printTable();
 

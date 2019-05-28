@@ -161,7 +161,7 @@ expr: TK_IDENTIFIER                   {$$ = newSyntaxNode (AST_SYMBOL,$1,0,0,0,0
     | expr OPERATOR_LE expr           {$$ = newSyntaxNode (AST_LE,0,$1,$3,0,0);}
     | expr OPERATOR_GE expr           {$$ = newSyntaxNode (AST_GE,0,$1,$3,0,0);}
     | expr OPERATOR_EQ expr           {$$ = newSyntaxNode (AST_EQ,0,$1,$3,0,0);}
-    | expr OPERATOR_DIF expr          {$$ = newSyntaxNode (AST_DIF,0,$1,$3,0,0);}
+    | expr OPERATOR_DIF expr          {$$ = newSyntaxNode (AST_NEQ,0,$1,$3,0,0);}
     | '(' expr ')'                    {$$ = newSyntaxNode (AST_PARENTHESES,0,$2,0,0,0);}
     ;
 

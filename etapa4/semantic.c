@@ -1,19 +1,22 @@
 #include "semantic.h"
 #include "hash.h"
 #include "symbols.h"
+#include "types.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 void printError(char *msg, char *type, char *varName);
+int getFunctionCallParamCount(AST *node);
+int typeInference(int, int);
 
-void declareSymbol(AST *node, int type){
+void declareSymbol(AST *node, int type) {
   if (node->symbol->type == SYMBOL_FUNC){
     if (node->sons[0]->symbol->type != SYMBOL_IDENTIFIER){
       printError("symbol redeclared","param", node->symbol->text);
       return;
     }
   }
-  else if (node->symbol->type != SYMBOL_IDENTIFIER){
+  else if (node->symbol->type != SYMBOL_IDENTIFIER) {
     fprintf (stderr,"semantic error: variable %s redeclared\n", node->symbol->text);
     switch (node->symbol->type){
       case SYMBOL_VAR:
@@ -33,24 +36,47 @@ void declareSymbol(AST *node, int type){
   switch (type){
     case AST_PARAM_ELEM:
       node->symbol->type = SYMBOL_VAR;
-      // TODO: setar tipo do parametro
+      setDataType(node, node->sons[0]->type);
+      node->symbol->n_params=0;
       break;
     case AST_VAR_DECL:
       node->symbol->type = SYMBOL_VAR;
-      // TODO: setar tipo da variavel
+      setDataType(node, node->sons[0]->type);
+      node->symbol->n_params=0;
       break;
     case AST_ARRAY_DECL:
       node->symbol->type = SYMBOL_ARRAY;
-      // TODO: setar tipo do array
+			setDataType(node, node->sons[0]->type);
+      node->symbol->n_params=0;
       break;
     case AST_FUNC_DECL:
       node->symbol->type = SYMBOL_FUNC;
-      // TODO: setar tipo de retorno da função
+			setDataType(node, node->sons[0]->type);
+      node->symbol->n_params=getFunctionCallParamCount(node->sons[1]);
+      printf("function %s has %d params\n", node->symbol->text, node->symbol->n_params);
+
       break;
   }
 }
 
-void hashCheckUndeclared(){
+void setDataType(AST *node, int type) {
+  switch (type) {
+    case AST_TINT:
+      node->symbol->dataType = DATATYPE_INT;
+      break;
+    case AST_TFLOAT:
+      node->symbol->dataType = DATATYPE_FLOAT;
+      break;
+    case AST_TBYTE:
+      node->symbol->dataType = DATATYPE_BYTE;
+      break;
+    default:
+      node->symbol->dataType = DATATYPE_UNDEFINED;
+  }
+  node->dataType = node->symbol->dataType;
+}
+
+void hashCheckUndeclared() {
   int i;
   for (i=0; i<HASH_SIZE; i++){
     NODE *node;
@@ -63,22 +89,22 @@ void hashCheckUndeclared(){
   return;
 }
 
-void checkSymbolsUsage(AST *node){
+void checkSymbolsUsage(AST *node) {
   if (node == 0) return;
   switch (node->type) {
     case AST_SYMBOL:
-      if (node->symbol->type == SYMBOL_VAR){
+      if (node->symbol->type == SYMBOL_VAR) {
         if (node->sons[0]){
           printError("trying to index a variable","variable", node->symbol->text);
         }
       }
-      else if (node->symbol->type == SYMBOL_ARRAY){
+      else if (node->symbol->type == SYMBOL_ARRAY) {
         if (node->sons[0]==0)
-          printError("array not being indexed", "array", node->symbol->text );
+          printError("array not being indexed", "array", node->symbol->text);
         else
           checkSymbolsUsage(node->sons[0]);
       }
-      else if (node->symbol->type == SYMBOL_FUNC){
+      else if (node->symbol->type == SYMBOL_FUNC) {
         printError("trying to use function as variable", "function", node->symbol->text);
       }
       break;
@@ -98,7 +124,7 @@ void checkSymbolsUsage(AST *node){
     case AST_LE:
     case AST_GE:
     case AST_EQ:
-    case AST_DIF:
+    case AST_NEQ:
       checkSymbolsUsage(node->sons[0]);
       checkSymbolsUsage(node->sons[1]);
       break;
@@ -173,6 +199,167 @@ void checkSymbolsUsage(AST *node){
   return;
 }
 
+
+void checkDataType(AST *node) {
+  if (node == NULL) return;
+
+  for (int i=0; i < MAX_SONS; i++) {
+    checkDataType(node->sons[i]);
+  }
+
+  switch (node->type) {
+    case AST_SYMBOL:
+      if (node->symbol->type == SYMBOL_ARRAY) {
+        printError("Invalid use of array", "symbol", node->symbol->text);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->symbol->type == SYMBOL_FUNC) {
+        printError("Invalid use of function", "symbol", node->symbol->text);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = node->symbol->dataType;
+      }
+      break;
+    case AST_ASSIGN:
+      if (node->sons[0]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't assign undefined expression", "assignment", node->symbol->text);
+      }
+      if (node->symbol->dataType != node->sons[0]->dataType) {
+        printError("Type conflict on assignment", "assignment", node->symbol->text);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = node->symbol->dataType;
+      }
+      break;
+    case AST_LT:
+    case AST_LE:
+    case AST_GT:
+    case AST_GE:
+      if (node->sons[0]->dataType == DATATYPE_BOOL || node->sons[1]->dataType == DATATYPE_BOOL) {
+        printError("Can't compare boolean expression", "comparison", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't compare undefined expressions", "comparison", NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+      break;
+    case AST_EQ:
+    case AST_NEQ:
+      if (node->sons[0]->dataType == DATATYPE_BOOL || node->sons[1]->dataType == DATATYPE_BOOL) {
+        printError("Can't compare booleans", "equality", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_STRING || node->sons[1]->dataType == DATATYPE_STRING) {
+        printError("Can't compare strings", "equality", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't compare undefined expressions", "equality", NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+      break;
+    case AST_AND:
+    case AST_OR:
+			if (node->sons[0]->dataType != DATATYPE_BOOL || node->sons[1]->dataType != DATATYPE_BOOL) {
+        printError("Expected boolean expressions", "logic expr", NULL);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_UNDEFINED || node->sons[1]->dataType == DATATYPE_UNDEFINED) {
+        printError("Unexpected undefined expression", "logic expr", NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+    case AST_NOT:
+      if (node->sons[0]->dataType == DATATYPE_UNDEFINED) {
+        printError("Can't negate an undefined expression", "negation", node->sons[0]->symbol->text);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->sons[0]->dataType != DATATYPE_BOOL) {
+        printError("Can't negate something that's not a boolean expression", "negation", node->sons[0]->symbol->text);
+      }
+      else {
+        node->dataType = DATATYPE_BOOL;
+      }
+      break;
+    case AST_ADD:
+    case AST_SUB:
+    case AST_MUL:
+    case AST_DIV:
+      if (node->sons[0]->dataType==DATATYPE_BOOL || node->sons[1]->dataType==DATATYPE_BOOL){
+        printError("expressão booleana não esperada em expressão aritmetica", NULL, NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->sons[0]->dataType==DATATYPE_UNDEFINED || node->sons[1]->dataType==DATATYPE_UNDEFINED){
+        printError("impossivel inferir tipo da expressão aritmética", NULL, NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else if (node->sons[0]->dataType==DATATYPE_STRING || node->sons[1]->dataType==DATATYPE_STRING){
+        printError("string não esperada em expressão aritmética", NULL, NULL);
+        node->dataType = DATATYPE_UNDEFINED;
+      }
+      else{
+        node->dataType = typeInference(node->sons[0]->dataType, node->sons[1]->dataType);
+      }
+      break;
+    //TODO: complete this
+  }
+}
+
+int typeInference(int type1, int type2){
+  if (type1 == DATATYPE_FLOAT || type2 == DATATYPE_FLOAT){
+    return DATATYPE_FLOAT;
+  }
+  else if (type1 == DATATYPE_INT || type2 == DATATYPE_INT){
+    return DATATYPE_INT;
+  }
+  else if (type1 == DATATYPE_BYTE || type2 == DATATYPE_BYTE){
+    return DATATYPE_BYTE;
+  }
+  else if (type1 == DATATYPE_CHAR || type2 == DATATYPE_CHAR){
+    return DATATYPE_CHAR;
+  }
+  else{
+    return DATATYPE_UNDEFINED;
+  }
+  return DATATYPE_UNDEFINED;
+}
+
+void checkFunctionCallParams(AST *node){
+  if (!node) return;
+  if (node->type==AST_FUNC_CALL){
+    int count = getFunctionCallParamCount(node->sons[0]);
+    if (count!=node->symbol->n_params){
+      printError("wrong number of params in function call", "function", node->symbol->text);
+      fprintf(stderr, "expected: %d / got: %d\n", node->symbol->n_params, count);
+    }
+  }
+  int i;
+  for (i=0;i<MAX_SONS;i++){
+    checkFunctionCallParams(node->sons[i]);
+  }
+}
+
+int getFunctionCallParamCount(AST *node){
+  if (!node) return 0;
+  int count=0;
+  while (node){
+    node = node->sons[1];
+    count++;
+  }
+  return count;
+}
+
 void printError(char *msg, char *type, char *varName){
-  fprintf(stderr, "semantic error: %s, %s %s\n", msg, type, varName);
+  if (varName) {
+    fprintf(stderr, "semantic error: %s, %s %s\n", msg, type, varName);
+  }
+  else
+    fprintf(stderr, "semantic error: %s, %s\n", msg, type);
 }
