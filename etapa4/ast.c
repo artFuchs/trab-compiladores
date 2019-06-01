@@ -7,7 +7,7 @@
 #include "ast.h"
 #include <stdio.h>
 
-AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST* son4){
+AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST* son4, int lineNumber){
   AST* newNode = 0;
   newNode = (AST*) calloc (1,sizeof(AST));
   newNode->type = type;
@@ -16,6 +16,7 @@ AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST
   newNode->sons[1] = son2;
   newNode->sons[2] = son3;
   newNode->sons[3] = son4;
+  newNode->lineNumber = lineNumber;
   return newNode;
 }
 

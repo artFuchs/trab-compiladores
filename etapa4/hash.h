@@ -13,6 +13,7 @@
 typedef struct node{
   int type;
   int dataType;
+  int lineNumber;
   char *text;
   int n_params;
   struct syntax_node *ast_link;
