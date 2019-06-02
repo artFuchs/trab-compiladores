@@ -299,15 +299,15 @@ void checkDataType(AST *node) {
     case AST_MUL:
     case AST_DIV:
       if (node->sons[0]->dataType==DATATYPE_BOOL || node->sons[1]->dataType==DATATYPE_BOOL){
-        printError("expressão booleana não esperada em expressão aritmetica", NULL, NULL, node->lineNumber);
+        printError("unexpected boolean expression inside aritmetic expression", NULL, NULL, node->lineNumber);
         node->dataType = DATATYPE_UNDEFINED;
       }
       else if (node->sons[0]->dataType==DATATYPE_UNDEFINED || node->sons[1]->dataType==DATATYPE_UNDEFINED){
-        printError("impossivel inferir tipo da expressão aritmética", NULL, NULL, node->lineNumber);
+        printError("couldn't assert aritmétic expression value", NULL, NULL, node->lineNumber);
         node->dataType = DATATYPE_UNDEFINED;
       }
       else if (node->sons[0]->dataType==DATATYPE_STRING || node->sons[1]->dataType==DATATYPE_STRING){
-        printError("string não esperada em expressão aritmética", NULL, NULL, node->lineNumber);
+        printError("unexpected string inside aritmetic expression", NULL, NULL, node->lineNumber);
         node->dataType = DATATYPE_UNDEFINED;
       }
       else{
@@ -326,7 +326,23 @@ void checkDataType(AST *node) {
     case AST_STRING:
       node->dataType = DATATYPE_STRING;
       break;
-    //TODO: complete this
+    case AST_RETURN:
+      if (node->sons[0]->dataType==DATATYPE_BOOL)
+        printError("boolean expression after keyword return", NULL, NULL, node->lineNumber);
+      else if (node->sons[0]->dataType==DATATYPE_STRING)
+        printError("string after keyword return", NULL, NULL, node->lineNumber);
+      else if (node->sons[0]->dataType==DATATYPE_UNDEFINED)
+        printError("couldn't assert the type of the expresion after keyword return", NULL, NULL, node->lineNumber);
+      break;
+    case AST_IF:
+    case AST_IF_ELSE:
+      if (node->sons[0]->dataType!=DATATYPE_BOOL){
+        printError("if case is not an boolean expression", NULL, NULL, node->lineNumber);
+      }
+      break;
+    case AST_PARENTHESES:
+      node->dataType = node->sons[0]->dataType;
+      break;
   }
 }
 
