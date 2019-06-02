@@ -237,6 +237,13 @@ void decompile (AST* node, FILE* output){
       decompile (node->sons[0], output);
       fprintf (output, " %s", node->symbol->text);
       break;
+    case AST_PRINT_ELEM:
+      decompile (node->sons[0], output);
+      if (node->sons[1]){
+        fprintf (output, ", ");
+        decompile (node->sons[1], output);
+      }
+      break;
     case AST_PRINT:
       fprintf (output, "print ");
       decompile (node->sons[0], output);

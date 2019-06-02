@@ -328,21 +328,38 @@ void checkDataType(AST *node) {
       break;
     case AST_RETURN:
       if (node->sons[0]->dataType==DATATYPE_BOOL)
-        printError("boolean expression after keyword return", NULL, NULL, node->lineNumber);
+        printError("return command does not accept boolean expressions", "", NULL, node->lineNumber);
       else if (node->sons[0]->dataType==DATATYPE_STRING)
-        printError("string after keyword return", NULL, NULL, node->lineNumber);
-      else if (node->sons[0]->dataType==DATATYPE_UNDEFINED)
-        printError("couldn't assert the type of the expresion after keyword return", NULL, NULL, node->lineNumber);
+        printError("return command does not accept strings", "", NULL, node->lineNumber);
+      else if (node->sons[0]->dataType==DATATYPE_UNDEFINED){
+        char *symbol;
+        if (node->sons[0]->symbol){
+          symbol = node->sons[0]->symbol->text;
+        }
+        printError("couldn't assert the type of the expresion after keyword return", symbol, NULL, node->lineNumber);
+      }
       break;
     case AST_IF:
     case AST_IF_ELSE:
       if (node->sons[0]->dataType!=DATATYPE_BOOL){
-        printError("if case is not an boolean expression", NULL, NULL, node->lineNumber);
+        printError("if conditional is not an boolean expression", "", NULL, node->lineNumber);
       }
       break;
     case AST_PARENTHESES:
       node->dataType = node->sons[0]->dataType;
       break;
+    case AST_PRINT_ELEM:
+      if (node->sons[0]->dataType == DATATYPE_BOOL){
+        printError("cannot print boolean", NULL, NULL, node->lineNumber);
+      }
+      else if (node->sons[0]->dataType == DATATYPE_UNDEFINED){
+        char *symbol;
+        if (node->sons[0]->symbol){
+          symbol = node->sons[0]->symbol->text;
+        }
+        printError("undefined expression in print command", symbol, NULL, node->lineNumber);
+      }
+
   }
 }
 
@@ -403,8 +420,8 @@ void compareFunctionParams(AST *node, AST *original_node){
 void printError(char *msg, char *type, char *varName, int lineNumber){
   semantic_errors+=1;
   if (varName) {
-    fprintf(stderr, "semantic error: %s, %s %s on line %d\n", msg, type, varName, lineNumber);
+    fprintf(stderr, "  - SEMANTIC ERROR: %s, %s %s on line %d\n", msg, type, varName, lineNumber);
   }
   else
-    fprintf(stderr, "semantic error: %s, %s on line %d\n", msg, type, lineNumber);
+    fprintf(stderr, "  - SEMANTIC ERROR: %s, %s on line %d\n", msg, type, lineNumber);
 }
