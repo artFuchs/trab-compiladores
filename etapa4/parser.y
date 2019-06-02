@@ -132,10 +132,10 @@ command: TK_IDENTIFIER '=' expr                   {$$ = newSyntaxNode (AST_ASSIG
       |                                           {$$ = 0;}
       ;
 
-print_list: expr rest_print_list                 {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$1,$2,0,0,getLineNumber());}
+print_list: expr rest_print_list                 {$$ = newSyntaxNode (AST_PRINT_ELEM,0,$1,$2,0,0,getLineNumber());}
           ;
 
-rest_print_list: ',' expr rest_print_list         {$$ = newSyntaxNode (AST_COMMA_DELIMITED_LIST,0,$2,$3,0,0,getLineNumber());}
+rest_print_list: ',' expr rest_print_list         {$$ = newSyntaxNode (AST_PRINT_ELEM,0,$2,$3,0,0,getLineNumber());}
                |                                  {$$ = 0;}
                ;
 
