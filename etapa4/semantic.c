@@ -10,10 +10,9 @@ int getFunctionCallParamCount(AST *node);
 int typeInference(int, int);
 void compareFunctionParams(AST*, AST*);
 
-int semantic_errors;
+int semantic_errors = 0;
 
 int fullSemanticCheck(AST *node){
-  semantic_errors = 0;
   printf("checking undeclared symbols in the hash...\n");
   hashCheckUndeclared();
   printf("checking symbol's usage...\n");
