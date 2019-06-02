@@ -45,7 +45,6 @@ void declareSymbol(AST *node, int type) {
         printError("symbol redeclared","function", node->symbol->text, node->lineNumber);
         break;
     }
-
     return;
   }
 
@@ -234,12 +233,11 @@ void checkDataType(AST *node) {
       if (node->sons[0]->dataType == DATATYPE_UNDEFINED) {
         printError("Can't assign undefined expression", "assignment", node->symbol->text, node->lineNumber);
       }
-      if (node->symbol->dataType != node->sons[0]->dataType) {
-        printError("Type conflict on assignment", "assignment", node->symbol->text, node->lineNumber);
-        node->dataType = DATATYPE_UNDEFINED;
-      }
-      else {
-        node->dataType = node->symbol->dataType;
+      else{
+        node->dataType = typeInference(node->symbol->dataType, node->sons[0]->dataType);
+        if (node->dataType == DATATYPE_UNDEFINED) {
+          printError("Type conflict on assignment", "assignment", node->symbol->text, node->lineNumber);
+        }
       }
       break;
     case AST_LT:

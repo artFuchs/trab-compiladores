@@ -42,7 +42,10 @@ int main(int argc, char *argv[]){
 
   int errors = 0;
   errors = fullSemanticCheck(global_ast);
-  if (errors) return 4;
+  if (errors) {
+    fprintf(stderr, "number of semantic errors: %d\n", errors);
+    return 4;
+  }
 
   return 0;
 }
