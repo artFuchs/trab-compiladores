@@ -1,0 +1,10 @@
+int a = O; 
+int b = O; 
+int ans = O; 
+int main ( ){print "digite o primeiro número: \n" ; 
+read a ; 
+print "digite o segundo número: \n" ; 
+read b ; 
+ans = a + b; 
+print "a soma de " , a, " e ", b, " é ", ans; 
+}; 
