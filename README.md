@@ -58,7 +58,7 @@ função deve prover um argumento para cada parâmetro, e ter o tipo compatível
 ## Etapa 5
 Geração de código intermediário de 3 endereços
 
-- [ ] implementação da estrutura de TACs (Triple Adress Code) -  Um novo
+- [X] implementação da estrutura de TACs (Triple Adress Code) -  Um novo
 módulo deve prover uma estrutura com instrução e três ponteiros para a tabela
 de símbolos, permitindo que essas instruções sejam encadeadas em
 listas de instruções. Cada instrução indica a execução de uma operação com
