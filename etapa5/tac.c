@@ -1,6 +1,11 @@
 #include "tac.h"
+#include "symbols.h"
 #include <stdio.h>
 #include <stdlib.h>
+
+
+NODE *tempCreate();
+NODE *labelCreate(char *labelText);
 
 TAC* tacCreate(int instruction, NODE *result, NODE *op1, NODE *op2){
   TAC *tac = (TAC*) calloc (1, sizeof(TAC));
@@ -80,4 +85,25 @@ void tacPrint(TAC *head){
     }
     tac=tac->next;
   }
+}
+
+NODE *tempCreate(int dataType){
+  static int varnum = 0;
+  char text[31];
+  sprintf(text,"__tempvar%d",varnum);
+  varnum++;
+  return hashInsert(SYMBOL_VAR,0,text);
+}
+
+NODE *labelCreate(char *labelText){
+  static int labelnum = 0;
+  char *text;
+  if (labelText)
+    text = labelText;
+  else{
+    text = (char*) calloc (29,sizeof(char));
+    sprintf(text,"__label%d",labelnum);
+    labelnum++;
+  }
+  return hashInsert(SYMBOL_VAR,0,text);
 }

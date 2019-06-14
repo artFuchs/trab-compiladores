@@ -7,8 +7,6 @@
 #ifndef TAC_H
 #define TAC_H
 
-#include "hash.h"
-
 #define TAC_SYMBOL 1
 #define TAC_MOVE 2
 
@@ -39,6 +37,7 @@
 #define TAC_READ      50
 #define TAC_PRINT     51
 
+#include "hash.h"
 
 typedef struct tac_node {
   int instruction;
