@@ -1,0 +1,16 @@
+int a = O; 
+int b [ G ]: O O O ; 
+int c [ H ]: O O ; 
+int foo ( int x , int y, int z){return x + y + z; 
+}; 
+int main ( ){b [ a ] = IH; 
+a = I; 
+b [ a ] = GO; 
+b [ a + I ] = IO; 
+a = foo (b[ a - I ] , b[ a ], b[ a - I ]); 
+read c ; 
+a [ O ] = a + I; 
+b = H; 
+foo = b; 
+foo [ a ] = a[ O ]; 
+}; 

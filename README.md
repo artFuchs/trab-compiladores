@@ -47,10 +47,37 @@ não declarado;
 Variáveis somente podem ser usadas sem indexação, vetores somente podem ser
 usados com indexação, funções apenas devem ser usadas com chamada, isto é,
 seguidas da lista de argumentos entre parênteses;
-- [ ] Tipos de dados – As declarações também devem registrar os tipos de dados, em um
+- [X] Tipos de dados – As declarações também devem registrar os tipos de dados, em um
 novo campo, dataType, na tabela de símbolos. Com o auxílio dessa informação,
 quando necessário, os tipos de dados corretos devem ser verificados onde forem
 usados, em expressões aritméticas, relacionais, lógicas, ou para índices de vetores;
-- [ ] Argumentos e parâmetros – A lista de argumentos deve ser verificada contra a lista de
-parâmetros formais na declaração da função. Cada chamada de função deve prover um
-argumento para cada parâmetro, e ter o tipo compatível;
+- [X] Argumentos e parâmetros – A lista de argumentos deve ser verificada
+contra a lista de parâmetros formais na declaração da função. Cada chamada de
+função deve prover um argumento para cada parâmetro, e ter o tipo compatível;
+
+## Etapa 5
+Geração de código intermediário de 3 endereços
+
+- [ ] implementação da estrutura de TACs (Triple Adress Code) -  Um novo
+módulo deve prover uma estrutura com instrução e três ponteiros para a tabela
+de símbolos, permitindo que essas instruções sejam encadeadas em
+listas de instruções. Cada instrução indica a execução de uma operação com
+zero, um ou dois operandos que serão valores em memória, e cujo resultado
+também está em memória, sendo os endereços de memória representados pelos
+símbolos na tabela de símbolos. O módulo deve prover rotinas utilitárias para
+criar, imprimir e unir listas de instruções;
+
+- [ ] Criação de símbolos temporários e *labels* - Devem ser feitas duas
+rotinas auxiliares que criam novos símbolos na tabela de símbolos (*hash*),
+uma para variáveis temporárias e outra para *labels*. Elas serão usadas na
+geração de código para guardar sub-resultados de cada operação e para marcar os
+pontos de desvio no fluxo de execução;
+
+- [ ] Geração de código - faça uma rotina que percorre a AST recursivamente,
+retornando um trecho de código intermediário (lista de TACs) para cada nodo
+visitado. Essa rotina primeiro processa os nodos filhos, armazena os trechos de
+código gerados para cada um deles, depois testa o nodo atual e gera o código
+correspondente para este nodo. A geração em geral consiste na criação de uma ou
+mais novas instruções (TACs), união dos trechos das sub-árvores e dessas novas
+instruções, opcionalmente com a criação de novos símbolos intermediários e
+labels, retornando um trecho de código completo desse novo nodo;
