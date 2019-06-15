@@ -175,18 +175,10 @@ void checkSymbolsUsage(AST *node) {
       checkSymbolsUsage(node->sons[2]);
       break;
     case AST_LOOP:
-      checkSymbolsUsage(node->sons[0]);
-      checkSymbolsUsage(node->sons[1]);
-      break;
     case AST_NO_DELIMITER_LIST:
-      checkSymbolsUsage(node->sons[0]);
-      checkSymbolsUsage(node->sons[1]);
-      break;
     case AST_COMMA_DELIMITED_LIST:
-      checkSymbolsUsage(node->sons[0]);
-      checkSymbolsUsage(node->sons[1]);
-      break;
     case AST_SEMICOLON_DELIMITED_LIST:
+    case AST_ARG_LIST:
       checkSymbolsUsage(node->sons[0]);
       checkSymbolsUsage(node->sons[1]);
       break;

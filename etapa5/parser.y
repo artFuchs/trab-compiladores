@@ -165,11 +165,11 @@ expr: TK_IDENTIFIER                   {$$ = newSyntaxNode (AST_SYMBOL,$1,0,0,0,0
     | '(' expr ')'                    {$$ = newSyntaxNode (AST_PARENTHESES,0,$2,0,0,0,getLineNumber());}
     ;
 
-arg_list: expr rest_arg_list           {$$ = newSyntaxNode (AST_NO_DELIMITER_LIST,0,$1,$2,0,0,getLineNumber());}
+arg_list: expr rest_arg_list           {$$ = newSyntaxNode (AST_ARG_LIST,0,$1,$2,0,0,getLineNumber());}
         |                              {$$ = 0;}
         ;
 
-rest_arg_list: ',' expr rest_arg_list  {$$ = newSyntaxNode (AST_COMMA_DELIMITED_LIST,0,$2,$3,0,0,getLineNumber());}
+rest_arg_list: ',' expr rest_arg_list  {$$ = newSyntaxNode (AST_ARG_LIST,0,$2,$3,0,0,getLineNumber());}
              |                         {$$ = 0;}
              ;
 

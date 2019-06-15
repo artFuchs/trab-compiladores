@@ -131,6 +131,7 @@ TAC* genTac(AST *ast){
     case AST_IF: result = genIfTac(code); break;
     case AST_IF_ELSE: result = genIfElseTac(code); break;
     case AST_LOOP: result = genLoopTac(code); break;
+    case AST_LEAP: break;
     default:
       result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
   }
