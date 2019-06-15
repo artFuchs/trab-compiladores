@@ -11,6 +11,7 @@ TAC* genFuncCallTac(AST *ast, TAC **code);
 TAC* genIfTac(TAC **code);
 TAC* genIfElseTac(TAC **code);
 TAC* genLoopTac(TAC **code);
+TAC* genPrintTac(TAC **code);
 NODE* tempCreate();
 NODE* labelCreate(char *labelText);
 
@@ -46,6 +47,7 @@ void tacPrint(TAC *head){
     switch (tac->instruction){
       case TAC_MOVE:      printf("MOVE "); break;
       case TAC_ARRAYW:    printf("ARRAYWRITE "); break;
+      case TAC_ARRAYR:    printf("ARRAYREAD "); break;
       case TAC_ADD:       printf("ADD "); break;
       case TAC_SUB:       printf("SUB "); break;
       case TAC_MUL:       printf("MUL "); break;
@@ -70,11 +72,7 @@ void tacPrint(TAC *head){
       case TAC_PRINT:     printf("PRINT "); break;
     }
 
-    switch (tac->instruction){
-      case TAC_SYMBOL:
-      case TAC_ARRAYR:
-        break;
-      default:
+    if (tac->instruction){
         if (tac->result) printf("%s ", tac->result->text);
         if (tac->op1) printf("%s ", tac->op1->text);
         if (tac->op2) printf("%s ", tac->op2->text);
@@ -98,10 +96,9 @@ TAC* genTac(AST *ast){
   switch (ast->type) {
     case AST_SYMBOL:
       if (ast->symbol->type == SYMBOL_ARRAY){
-        TAC* vec = tacCreate(TAC_ARRAYR, tempCreate(),
+        result = tacCreate(TAC_ARRAYR, tempCreate(),
                                          ast->symbol,
                                          code[0]?code[0]->result:0);
-        result = tacJoin(code[0], vec);
       }else{
         result = tacCreate(TAC_SYMBOL, ast->symbol, 0, 0); break;
       }
@@ -132,6 +129,8 @@ TAC* genTac(AST *ast){
     case AST_IF_ELSE: result = genIfElseTac(code); break;
     case AST_LOOP: result = genLoopTac(code); break;
     case AST_LEAP: break;
+    case AST_PRINT: result = genPrintTac(code); break;
+    case AST_READ: result = tacCreate(TAC_READ,ast->symbol,0,0); break;
     default:
       result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
   }
@@ -218,6 +217,17 @@ TAC* genLoopTac(TAC **code){
                       tacJoin(ifz,
                               tacJoin(code[1],
                                       tacJoin(jump, labelEndTac)))));
+}
+
+TAC* genPrintTac(TAC **code){
+  TAC* aux = code[0];
+  TAC* printTacs = NULL;
+  while (aux){
+    TAC* aux1 = tacCreate(TAC_PRINT, aux->result,0,0);
+    printTacs = tacJoin(printTacs, aux1);
+    aux = aux->next;
+  }
+  return tacJoin(code[0],printTacs);
 }
 
 NODE *tempCreate(){
