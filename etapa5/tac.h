@@ -7,38 +7,41 @@
 #ifndef TAC_H
 #define TAC_H
 
-#define TAC_SYMBOL    0
+#define TAC_SYMBOL     0
+#define TAC_VAR_DECL   1
+#define TAC_ARRAY_DECL 2
 
-#define TAC_MOVE      1
-#define TAC_ARRAYW    2
-#define TAC_ARRAYR    3
+#define TAC_MOVE      11
+#define TAC_ARRAYW    12
+#define TAC_ARRAYR    13
 
-#define TAC_ADD       11
-#define TAC_SUB       12
-#define TAC_MUL       13
-#define TAC_DIV       14
+#define TAC_ADD       21
+#define TAC_SUB       22
+#define TAC_MUL       23
+#define TAC_DIV       24
 
-#define TAC_AND       20
-#define TAC_OR        21
-#define TAC_NOT       22
-#define TAC_LT        23
-#define TAC_GT        24
-#define TAC_LE        25
-#define TAC_GE        26
-#define TAC_EQ        27
-#define TAC_NEQ       28
+#define TAC_AND       30
+#define TAC_OR        31
+#define TAC_NOT       32
+#define TAC_LT        33
+#define TAC_GT        34
+#define TAC_LE        35
+#define TAC_GE        36
+#define TAC_EQ        37
+#define TAC_NEQ       38
 
-#define TAC_CALL      30
-#define TAC_BEGINFUN  31
-#define TAC_ENDFUN    32
-#define TAC_ARG       33
+#define TAC_CALL      40
+#define TAC_BEGINFUN  41
+#define TAC_ENDFUN    42
+#define TAC_ARG       43
 
-#define TAC_IFZ       40
-#define TAC_JUMP      41
-#define TAC_LABEL     42
+#define TAC_IFZ       50
+#define TAC_JUMP      51
+#define TAC_LABEL     52
 
-#define TAC_READ      50
-#define TAC_PRINT     51
+#define TAC_READ      60
+#define TAC_PRINT     61
+#define TAC_RETURN    62
 
 #include "hash.h"
 

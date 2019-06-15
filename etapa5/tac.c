@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+TAC* genSymbolTac(AST* ast, TAC **code);
+TAC* genFuncDeclTac(AST *ast, TAC **code);
 TAC* genUnopTac(int inst, TAC **code);
 TAC* genBinopTac(int inst, TAC **code);
 TAC* genMoveTac(AST* ast, TAC **code);
@@ -12,6 +14,7 @@ TAC* genIfTac(TAC **code);
 TAC* genIfElseTac(TAC **code);
 TAC* genLoopTac(TAC **code);
 TAC* genPrintTac(TAC **code);
+TAC* genReturnTac(TAC **code);
 NODE* tempCreate();
 NODE* labelCreate(char *labelText);
 
@@ -45,6 +48,8 @@ void tacPrint(TAC *head){
   fprintf(stderr, "\n\tTAC CODE:\n");
   while (tac){
     switch (tac->instruction){
+      case TAC_VAR_DECL:  printf("VAR "); break;
+      case TAC_ARRAY_DECL:  printf("ARRAY "); break;
       case TAC_MOVE:      printf("MOVE "); break;
       case TAC_ARRAYW:    printf("ARRAYWRITE "); break;
       case TAC_ARRAYR:    printf("ARRAYREAD "); break;
@@ -62,7 +67,7 @@ void tacPrint(TAC *head){
       case TAC_EQ:        printf("EQ "); break;
       case TAC_NEQ:       printf("NEQ "); break;
       case TAC_CALL:      printf("CALL "); break;
-      case TAC_BEGINFUN:  printf("BEGINFUN "); break;
+      case TAC_BEGINFUN:  printf("\nBEGINFUN "); break;
       case TAC_ENDFUN:    printf("ENDFUN "); break;
       case TAC_ARG:       printf("ARG "); break;
       case TAC_IFZ:       printf("IFZ "); break;
@@ -70,6 +75,7 @@ void tacPrint(TAC *head){
       case TAC_LABEL:     printf("LABEL "); break;
       case TAC_READ:      printf("READ "); break;
       case TAC_PRINT:     printf("PRINT "); break;
+      case TAC_RETURN:    printf("RETURN "); break;
     }
 
     if (tac->instruction){
@@ -77,6 +83,8 @@ void tacPrint(TAC *head){
         if (tac->op1) printf("%s ", tac->op1->text);
         if (tac->op2) printf("%s ", tac->op2->text);
         printf("\n");
+        if (tac->instruction == TAC_ENDFUN)
+          printf("\n");
     }
 
     tac=tac->next;
@@ -94,16 +102,14 @@ TAC* genTac(AST *ast){
   }
 
   switch (ast->type) {
-    case AST_SYMBOL:
-      if (ast->symbol->type == SYMBOL_ARRAY){
-        result = tacCreate(TAC_ARRAYR, tempCreate(),
-                                         ast->symbol,
-                                         code[0]?code[0]->result:0);
-      }else{
-        result = tacCreate(TAC_SYMBOL, ast->symbol, 0, 0); break;
-      }
-      break;
+    case AST_SYMBOL: result = genSymbolTac(ast,code); break;
     case AST_PARAM_ELEM:
+    case AST_VAR_DECL:
+      result = tacCreate(TAC_VAR_DECL, ast->symbol, 0, 0); break;
+    case AST_ARRAY_DECL:
+      result = tacCreate(TAC_ARRAY_DECL, ast->symbol, code[0]?code[0]->result:0, 0);
+      break;
+    case AST_FUNC_DECL: result = genFuncDeclTac(ast,code); break;
     case AST_INTEGER:
     case AST_FLOAT:
     case AST_CHAR:
@@ -131,6 +137,7 @@ TAC* genTac(AST *ast){
     case AST_LEAP: break;
     case AST_PRINT: result = genPrintTac(code); break;
     case AST_READ: result = tacCreate(TAC_READ,ast->symbol,0,0); break;
+    case AST_RETURN: result = genReturnTac(code); break;
     default:
       result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
   }
@@ -139,9 +146,22 @@ TAC* genTac(AST *ast){
 }
 
 TAC* lastTAC(TAC* root){
+  if (!root) return 0;
   TAC* aux= root;
   while (aux->next) aux = aux->next;
   return aux;
+}
+
+TAC* genSymbolTac(AST *ast, TAC **code){
+  TAC* symbol = 0;
+  if (ast->symbol->type == SYMBOL_ARRAY){
+    symbol = tacCreate(TAC_ARRAYR, tempCreate(),
+                                     ast->symbol,
+                                     code[0]?code[0]->result:0);
+  }else{
+    symbol = tacCreate(TAC_SYMBOL, ast->symbol, 0, 0);
+  }
+  return symbol;
 }
 
 TAC* genUnopTac(int inst, TAC **code){
@@ -153,7 +173,9 @@ TAC* genUnopTac(int inst, TAC **code){
 TAC* genBinopTac(int inst, TAC **code){
   TAC* aux0 = lastTAC(code[0]);
   TAC* aux1 = lastTAC(code[1]);
-  while (aux1->next) aux1 = aux1->next;
+  if (aux1) {
+    while (aux1->next) aux1 = aux1->next;
+  }
   TAC* newTac = tacCreate(inst, tempCreate(), aux0 ? aux0->result : 0, aux1 ? aux1->result : 0);
   return tacJoin(code[0], tacJoin(code[1],newTac));
 }
@@ -177,6 +199,15 @@ TAC* genArrayWriteTac(AST *ast, TAC **code){
 TAC* genFuncCallTac(AST *ast, TAC **code){
   TAC* fun = tacCreate(TAC_CALL,tempCreate(),ast->symbol, 0);
   return tacJoin(code[0],fun);
+}
+
+TAC* genFuncDeclTac(AST *ast, TAC **code){
+  char label[80];
+  sprintf(label,"__func_%s",ast->symbol->text);
+  NODE* labelNode = labelCreate(label);
+  TAC* funcBegin = tacCreate(TAC_BEGINFUN, labelNode, 0, 0);
+  TAC* funcEnd = tacCreate(TAC_ENDFUN, labelNode, 0, 0);
+  return tacJoin(code[1], tacJoin(funcBegin, tacJoin(code[2], funcEnd)));
 }
 
 TAC* genIfTac(TAC **code){
@@ -228,6 +259,12 @@ TAC* genPrintTac(TAC **code){
     aux = aux->next;
   }
   return tacJoin(code[0],printTacs);
+}
+
+TAC* genReturnTac(TAC **code){
+  TAC* aux = lastTAC(code[0]);
+  TAC* returnTac = tacCreate(TAC_RETURN, aux?aux->result:0, 0, 0);
+  return tacJoin(code[0], returnTac);
 }
 
 NODE *tempCreate(){
