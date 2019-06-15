@@ -10,6 +10,7 @@ TAC* genArrayWriteTac(AST *ast, TAC **code);
 TAC* genFuncCallTac(AST *ast, TAC **code);
 TAC* genIfTac(TAC **code);
 TAC* genIfElseTac(TAC **code);
+TAC* genLoopTac(TAC **code);
 NODE* tempCreate();
 NODE* labelCreate(char *labelText);
 
@@ -129,6 +130,7 @@ TAC* genTac(AST *ast){
     case AST_FUNC_CALL: result = genFuncCallTac(ast,code); break;
     case AST_IF: result = genIfTac(code); break;
     case AST_IF_ELSE: result = genIfElseTac(code); break;
+    case AST_LOOP: result = genLoopTac(code); break;
     default:
       result = tacJoin(code[0], tacJoin(code[1], tacJoin(code[2], code[3])));
   }
@@ -136,26 +138,39 @@ TAC* genTac(AST *ast){
   return result;
 }
 
+TAC* lastTAC(TAC* root){
+  TAC* aux= root;
+  while (aux->next) aux = aux->next;
+  return aux;
+}
+
 TAC* genUnopTac(int inst, TAC **code){
-  TAC* newTac = tacCreate(inst, tempCreate(), code[0] ? code[0]->result : 0, 0);
-  return tacJoin(code[0], newTac);
+  TAC* aux = lastTAC(code[0]);
+  TAC* newTac = tacCreate(inst, tempCreate(), aux ? aux->result : 0, 0);
+  return tacJoin(aux, newTac);
 }
 
 TAC* genBinopTac(int inst, TAC **code){
-  TAC* newTac = tacCreate(inst, tempCreate(), code[0] ? code[0]->result : 0, code[1] ? code[1]->result : 0);
+  TAC* aux0 = lastTAC(code[0]);
+  TAC* aux1 = lastTAC(code[1]);
+  while (aux1->next) aux1 = aux1->next;
+  TAC* newTac = tacCreate(inst, tempCreate(), aux0 ? aux0->result : 0, aux1 ? aux1->result : 0);
   return tacJoin(code[0], tacJoin(code[1],newTac));
 }
 
 TAC* genMoveTac(AST* ast, TAC **code){
+  TAC* aux= lastTAC(code[0]);
   TAC* mv = tacCreate(TAC_MOVE, ast->symbol,
-                                code[0] ? code[0]->result : 0, 0);
+                                aux ? aux->result : 0, 0);
   return tacJoin(code[0], mv);
 }
 
 TAC* genArrayWriteTac(AST *ast, TAC **code){
+  TAC* aux0 = lastTAC(code[0]);
+  TAC* aux1 = lastTAC(code[1]);
   TAC* mv = tacCreate(TAC_ARRAYW, ast->symbol,
-                                  code[0] ? code[0]->result : 0,
-                                  code[1] ? code[1]->result : 0);
+                                  aux0 ? aux0->result : 0,
+                                  aux1 ? aux1->result : 0);
   return tacJoin(code[0], tacJoin(code[1], mv));
 }
 
@@ -166,7 +181,8 @@ TAC* genFuncCallTac(AST *ast, TAC **code){
 
 TAC* genIfTac(TAC **code){
   NODE* label = labelCreate(NULL);
-  TAC* ifztac = tacCreate(TAC_IFZ, label, code[0]?code[0]->result:0, 0);
+  TAC* aux = lastTAC(code[0]);
+  TAC* ifztac = tacCreate(TAC_IFZ, label, aux?aux->result:0, 0);
   TAC* labtac = tacCreate(TAC_LABEL, label, 0, 0);
   return tacJoin(code[0],tacJoin(ifztac,tacJoin(code[1],labtac)));
 }
@@ -174,7 +190,8 @@ TAC* genIfTac(TAC **code){
 TAC* genIfElseTac(TAC **code){
   NODE* labelelse = labelCreate(NULL);
   NODE* labelendif = labelCreate(NULL);
-  TAC* ifztac = tacCreate(TAC_IFZ, labelelse, code[0]?code[0]->result:0, 0);
+  TAC* aux= lastTAC(code[0]);
+  TAC* ifztac = tacCreate(TAC_IFZ, labelelse, aux?aux->result:0, 0);
   TAC* jump = tacCreate(TAC_JUMP, labelendif, 0, 0);
   TAC* labElseTac = tacCreate(TAC_LABEL, labelelse, 0, 0);
   TAC* labEndifTac = tacCreate(TAC_LABEL, labelendif, 0, 0);
@@ -185,6 +202,21 @@ TAC* genIfElseTac(TAC **code){
                                        tacJoin(labElseTac,
                                              tacJoin(code[2],
                                                     labEndifTac))))));
+}
+
+TAC* genLoopTac(TAC **code){
+  NODE* labelInit = labelCreate(NULL);
+  NODE* labelEnd = labelCreate(NULL);
+  TAC* labelInitTac = tacCreate(TAC_LABEL,labelInit,0,0);
+  TAC* aux= lastTAC(code[0]);
+  TAC* ifz = tacCreate(TAC_IFZ,labelEnd,aux?aux->result:0,0);
+  TAC* jump = tacCreate(TAC_JUMP,labelInit,0,0);
+  TAC* labelEndTac = tacCreate(TAC_LABEL,labelEnd,0,0);
+  return tacJoin(labelInitTac,
+                tacJoin(code[0],
+                      tacJoin(ifz,
+                              tacJoin(code[1],
+                                      tacJoin(jump, labelEndTac)))));
 }
 
 NODE *tempCreate(){
@@ -202,7 +234,7 @@ NODE *labelCreate(char *labelText){
     text = labelText;
   else{
     text = (char*) calloc (29,sizeof(char));
-    sprintf(text,"__label%d",labelnum);
+    sprintf(text,"#label%d",labelnum);
     labelnum++;
   }
   return hashInsert(SYMBOL_VAR,0,text);
