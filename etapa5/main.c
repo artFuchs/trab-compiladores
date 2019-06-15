@@ -10,6 +10,7 @@
 #include "y.tab.h"
 #include "ast.h"
 #include "semantic.h"
+#include "tac.h"
 
 void initMe();
 extern FILE *yyin;
@@ -46,6 +47,9 @@ int main(int argc, char *argv[]){
     fprintf(stderr, "number of semantic errors: %d\n", errors);
     return 4;
   }
+
+  TAC *taccode = genTac(global_ast);
+  tacPrint(taccode);
 
   return 0;
 }

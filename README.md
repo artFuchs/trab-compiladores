@@ -67,7 +67,7 @@ também está em memória, sendo os endereços de memória representados pelos
 símbolos na tabela de símbolos. O módulo deve prover rotinas utilitárias para
 criar, imprimir e unir listas de instruções;
 
-- [ ] Criação de símbolos temporários e *labels* - Devem ser feitas duas
+- [X] Criação de símbolos temporários e *labels* - Devem ser feitas duas
 rotinas auxiliares que criam novos símbolos na tabela de símbolos (*hash*),
 uma para variáveis temporárias e outra para *labels*. Elas serão usadas na
 geração de código para guardar sub-resultados de cada operação e para marcar os

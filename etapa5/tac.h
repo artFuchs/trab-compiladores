@@ -7,13 +7,16 @@
 #ifndef TAC_H
 #define TAC_H
 
-#define TAC_SYMBOL 1
-#define TAC_MOVE 2
+#define TAC_SYMBOL    0
 
-#define TAC_ADD       10
-#define TAC_SUB       11
-#define TAC_MUL       12
-#define TAC_DIV       13
+#define TAC_MOVE      1
+#define TAC_ARRAYW    2
+#define TAC_ARRAYR    3
+
+#define TAC_ADD       11
+#define TAC_SUB       12
+#define TAC_MUL       13
+#define TAC_DIV       14
 
 #define TAC_AND       20
 #define TAC_OR        21
@@ -59,5 +62,9 @@ TAC* tacJoin(TAC *fst, TAC *snd);
 // tacPrint
 // navigate the TAC list and print the elements
 void tacPrint(TAC *head);
+
+// genTacs
+// navigate an AST, generating a TACs list;
+TAC* genTac(AST *ast);
 
 #endif
