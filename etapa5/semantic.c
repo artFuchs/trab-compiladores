@@ -341,7 +341,7 @@ void checkDataType(AST *node) {
     case AST_PARENTHESES:
       node->dataType = node->sons[0]->dataType;
       break;
-    case AST_PRINT_ELEM:
+    case AST_PRINT_LIST:
       if (node->sons[0]->dataType == DATATYPE_BOOL){
         printError("cannot print boolean", NULL, NULL, node->lineNumber);
       }
