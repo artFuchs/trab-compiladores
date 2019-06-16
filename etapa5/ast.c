@@ -55,6 +55,8 @@ void printNode (AST* node, int depth){
     case AST_COMMA_DELIMITED_LIST: printf("AST_COMMA_DELIMITED_LIST"); break;
     case AST_SEMICOLON_DELIMITED_LIST: printf("AST_SEMICOLON_DELIMITED_LIST"); break;
     case AST_PARAM_ELEM: printf("AST_PARAM_ELEM"); break;
+    case AST_PRINT_LIST: printf("AST_PRINT_LIST"); break;
+    case AST_ARG_LIST: printf("AST_ARG_LIST"); break;
     case AST_PRINT: printf("AST_PRINT"); break;
     case AST_READ: printf("AST_READ"); break;
     case AST_RETURN: printf("AST_RETURN"); break;
@@ -237,13 +239,19 @@ void decompile (AST* node, FILE* output){
       decompile (node->sons[0], output);
       fprintf (output, " %s", node->symbol->text);
       break;
-    case AST_PRINT_ELEM:
+    case AST_PRINT_LIST:
       decompile (node->sons[0], output);
       if (node->sons[1]){
         fprintf (output, ", ");
         decompile (node->sons[1], output);
       }
       break;
+    case AST_ARG_LIST:
+      decompile(node->sons[0], output);
+      if(node->sons[1]){
+        fprintf (output, ", ");
+        decompile (node->sons[1], output);
+      }
     case AST_PRINT:
       fprintf (output, "print ");
       decompile (node->sons[0], output);
