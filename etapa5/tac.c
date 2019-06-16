@@ -12,6 +12,7 @@ TAC* genBinopTac(int inst, TAC **code);
 TAC* genMoveTac(AST* ast, TAC **code);
 TAC* genArrayWriteTac(AST *ast, TAC **code);
 TAC* genFuncCallTac(AST *ast, TAC **code);
+TAC* genFuncCallArgTac(AST *ast, TAC **code);
 TAC* genIfTac(TAC **code);
 TAC* genIfElseTac(TAC **code);
 TAC* genLoopTac(TAC **code);
@@ -76,7 +77,8 @@ void tacPrint(TAC *head){
       case TAC_CALL:      printf("CALL "); break;
       case TAC_BEGINFUN:  printf("\nBEGINFUN "); break;
       case TAC_ENDFUN:    printf("ENDFUN "); break;
-      case TAC_ARG:       printf("ARG "); break;
+      case TAC_ARGREAD:   printf("ARGREAD "); break;
+      case TAC_ARGWRITE:  printf("ARGWRITE "); break;
       case TAC_IFZ:       printf("IFZ "); break;
       case TAC_JUMP:      printf("JUMP "); break;
       case TAC_LABEL:     printf("LABEL "); break;
@@ -135,6 +137,7 @@ TAC* genTac(AST *ast){
     case AST_ASSIGN: result = genMoveTac(ast, code); break;
     case AST_ARRAY_ASSIGN: result = genArrayWriteTac(ast, code); break;
     case AST_FUNC_CALL: result = genFuncCallTac(ast,code); break;
+    case AST_ARG_LIST: result = genFuncCallArgTac(ast,code); break;
     case AST_IF: result = genIfTac(code); break;
     case AST_IF_ELSE: result = genIfElseTac(code); break;
     case AST_LOOP: result = genLoopTac(code); break;
@@ -229,17 +232,38 @@ TAC* genArrayWriteTac(AST *ast, TAC **code){
 }
 
 TAC* genFuncCallTac(AST *ast, TAC **code){
-  TAC* fun = tacCreate(TAC_CALL,tempCreate(),ast->symbol, 0);
+  char label[80];
+  sprintf(label,"%s",ast->symbol->text);
+  NODE* labelNode = labelCreate(label);
+  TAC* fun = tacCreate(TAC_CALL,tempCreate(),labelNode, 0);
+  TAC* args = NULL;
+  AST* aux = ast->sons[0];
   return tacJoin(code[0],fun);
+}
+
+TAC* genFuncCallArgTac(AST *ast, TAC **code){
+  TAC* arg = tacCreate(TAC_ARGWRITE, code[0]?code[0]->result:0, 0, 0);
+  return tacJoin(code[1],tacJoin(code[0], arg));
 }
 
 TAC* genFuncDeclTac(AST *ast, TAC **code){
   char label[80];
-  sprintf(label,"__func_%s",ast->symbol->text);
+  sprintf(label,"%s",ast->symbol->text);
   NODE* labelNode = labelCreate(label);
   TAC* funcBegin = tacCreate(TAC_BEGINFUN, labelNode, 0, 0);
+  // create the tacs to assign values to the parameters
+  TAC* params = NULL;
+  AST* aux = ast->sons[1];
+  while (aux){
+    TAC* param = tacCreate(TAC_ARGREAD, aux->sons[0]->symbol, 0, 0);
+    params = tacJoin(params,param);
+    aux = aux->sons[1];
+  }
   TAC* funcEnd = tacCreate(TAC_ENDFUN, labelNode, 0, 0);
-  return tacJoin(code[1], tacJoin(funcBegin, tacJoin(code[2], funcEnd)));
+  return tacJoin(code[1],
+          tacJoin(funcBegin,
+            tacJoin(params,
+              tacJoin(code[2], funcEnd))));
 }
 
 TAC* genIfTac(TAC **code){

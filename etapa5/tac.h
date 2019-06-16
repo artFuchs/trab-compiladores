@@ -38,7 +38,8 @@
 #define TAC_CALL      40
 #define TAC_BEGINFUN  41
 #define TAC_ENDFUN    42
-#define TAC_ARG       43
+#define TAC_ARGREAD   43
+#define TAC_ARGWRITE  44
 
 #define TAC_IFZ       50
 #define TAC_JUMP      51
