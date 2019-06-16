@@ -4,6 +4,8 @@
 #include <stdlib.h>
 
 TAC* genSymbolTac(AST* ast, TAC **code);
+TAC* genVarDeclTac(AST *ast, TAC **code);
+TAC* genArrayDeclTac(AST *ast);
 TAC* genFuncDeclTac(AST *ast, TAC **code);
 TAC* genUnopTac(int inst, TAC **code);
 TAC* genBinopTac(int inst, TAC **code);
@@ -48,8 +50,13 @@ void tacPrint(TAC *head){
   fprintf(stderr, "\n\tTAC CODE:\n");
   while (tac){
     switch (tac->instruction){
-      case TAC_VAR_DECL:  printf("VAR "); break;
-      case TAC_ARRAY_DECL:  printf("ARRAY "); break;
+      case TAC_INT_DECL:  printf("INT "); break;
+      case TAC_BYTE_DECL:  printf("BYTE "); break;
+      case TAC_FLOAT_DECL:  printf("FLOAT "); break;
+      case TAC_BYTEA_DECL:  printf("BYTEA "); break;
+      case TAC_INTA_DECL:  printf("INTA "); break;
+      case TAC_FLOATA_DECL:  printf("FLOATA "); break;
+      case TAC_ARRAY_INIT:  printf("ARRAYINIT "); break;
       case TAC_MOVE:      printf("MOVE "); break;
       case TAC_ARRAYW:    printf("ARRAYWRITE "); break;
       case TAC_ARRAYR:    printf("ARRAYREAD "); break;
@@ -104,11 +111,8 @@ TAC* genTac(AST *ast){
   switch (ast->type) {
     case AST_SYMBOL: result = genSymbolTac(ast,code); break;
     case AST_PARAM_ELEM:
-    case AST_VAR_DECL:
-      result = tacCreate(TAC_VAR_DECL, ast->symbol, 0, 0); break;
-    case AST_ARRAY_DECL:
-      result = tacCreate(TAC_ARRAY_DECL, ast->symbol, code[0]?code[0]->result:0, 0);
-      break;
+    case AST_VAR_DECL: result = genVarDeclTac(ast,code); break;
+    case AST_ARRAY_DECL: result = genArrayDeclTac(ast); break;
     case AST_FUNC_DECL: result = genFuncDeclTac(ast,code); break;
     case AST_INTEGER:
     case AST_FLOAT:
@@ -164,6 +168,34 @@ TAC* genSymbolTac(AST *ast, TAC **code){
   return symbol;
 }
 
+TAC* genVarDeclTac(AST *ast, TAC **code){
+  int type;
+  switch (ast->sons[0]->type){
+    case AST_TBYTE: type = TAC_BYTE_DECL; break;
+    case AST_TINT: type = TAC_INT_DECL; break;
+    case AST_TFLOAT: type = TAC_FLOAT_DECL; break;
+  }
+  return tacCreate(type,ast->symbol,code[1]?code[1]->result:0,0);
+}
+
+TAC* genArrayDeclTac(AST *ast){
+  int type;
+  switch (ast->sons[0]->type){
+    case AST_TBYTE: type = TAC_BYTEA_DECL; break;
+    case AST_TINT: type = TAC_INTA_DECL; break;
+    case AST_TFLOAT: type = TAC_FLOATA_DECL; break;
+  }
+  TAC* decl = tacCreate(type,ast->symbol,ast->sons[1]?ast->sons[1]->symbol:0,0);
+  AST* aux = ast->sons[2];
+  TAC* init = NULL;
+  while (aux){
+    TAC* initPos = tacCreate(TAC_ARRAY_INIT,ast->symbol,aux->sons[0]?aux->sons[0]->symbol:0,0);
+    init = tacJoin(init,initPos);
+    aux = aux->sons[1];
+  }
+  return tacJoin(decl,init);
+}
+
 TAC* genUnopTac(int inst, TAC **code){
   TAC* aux = lastTAC(code[0]);
   TAC* newTac = tacCreate(inst, tempCreate(), aux ? aux->result : 0, 0);
@@ -181,7 +213,7 @@ TAC* genBinopTac(int inst, TAC **code){
 }
 
 TAC* genMoveTac(AST* ast, TAC **code){
-  TAC* aux= lastTAC(code[0]);
+  TAC* aux = lastTAC(code[0]);
   TAC* mv = tacCreate(TAC_MOVE, ast->symbol,
                                 aux ? aux->result : 0, 0);
   return tacJoin(code[0], mv);

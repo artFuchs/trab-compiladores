@@ -8,8 +8,13 @@
 #define TAC_H
 
 #define TAC_SYMBOL     0
-#define TAC_VAR_DECL   1
-#define TAC_ARRAY_DECL 2
+#define TAC_BYTE_DECL  1
+#define TAC_INT_DECL   2
+#define TAC_FLOAT_DECL 3
+#define TAC_BYTEA_DECL 4
+#define TAC_INTA_DECL 5
+#define TAC_FLOATA_DECL 6
+#define TAC_ARRAY_INIT 7
 
 #define TAC_MOVE      11
 #define TAC_ARRAYW    12
