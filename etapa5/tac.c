@@ -242,8 +242,18 @@ TAC* genFuncCallTac(AST *ast, TAC **code){
 }
 
 TAC* genFuncCallArgTac(AST *ast, TAC **code){
-  TAC* arg = tacCreate(TAC_ARGWRITE, code[0]?code[0]->result:0, 0, 0);
-  return tacJoin(code[1],tacJoin(code[0], arg));
+  int paramN = 0;
+  TAC* args = NULL;
+  AST* aux = ast;
+  while (aux){
+    char numText[22];
+    sprintf(numText,"%d",paramN);
+    NODE* numNode = hashInsert(SYMBOL_LIT_INT, 0, numText);
+    args = tacJoin(args, tacCreate(TAC_ARGWRITE, aux->sons[0]->symbol?aux->sons[0]->symbol:0, numNode?numNode:0, 0));
+    aux = aux->sons[1];
+    paramN++;
+  }
+  return args;
 }
 
 TAC* genFuncDeclTac(AST *ast, TAC **code){
@@ -251,19 +261,10 @@ TAC* genFuncDeclTac(AST *ast, TAC **code){
   sprintf(label,"%s",ast->symbol->text);
   NODE* labelNode = labelCreate(label);
   TAC* funcBegin = tacCreate(TAC_BEGINFUN, labelNode, 0, 0);
-  // create the tacs to assign values to the parameters
-  TAC* params = NULL;
-  AST* aux = ast->sons[1];
-  while (aux){
-    TAC* param = tacCreate(TAC_ARGREAD, aux->sons[0]->symbol, 0, 0);
-    params = tacJoin(params,param);
-    aux = aux->sons[1];
-  }
   TAC* funcEnd = tacCreate(TAC_ENDFUN, labelNode, 0, 0);
   return tacJoin(code[1],
           tacJoin(funcBegin,
-            tacJoin(params,
-              tacJoin(code[2], funcEnd))));
+            tacJoin(code[2], funcEnd)));
 }
 
 TAC* genIfTac(TAC **code){
