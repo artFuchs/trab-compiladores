@@ -73,7 +73,7 @@ uma para variáveis temporárias e outra para *labels*. Elas serão usadas na
 geração de código para guardar sub-resultados de cada operação e para marcar os
 pontos de desvio no fluxo de execução;
 
-- [ ] Geração de código - faça uma rotina que percorre a AST recursivamente,
+- [X] Geração de código - faça uma rotina que percorre a AST recursivamente,
 retornando um trecho de código intermediário (lista de TACs) para cada nodo
 visitado. Essa rotina primeiro processa os nodos filhos, armazena os trechos de
 código gerados para cada um deles, depois testa o nodo atual e gera o código
@@ -81,3 +81,9 @@ correspondente para este nodo. A geração em geral consiste na criação de uma
 mais novas instruções (TACs), união dos trechos das sub-árvores e dessas novas
 instruções, opcionalmente com a criação de novos símbolos intermediários e
 labels, retornando um trecho de código completo desse novo nodo;
+
+## Etapa 6
+A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
+- [ ] avaliação de quais são os códigos correspondentes para cada instrução da
+TAC em assembly AT&T ;
+- [ ] fazer a geração de assembly para cada TAC;
