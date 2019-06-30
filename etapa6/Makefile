@@ -18,7 +18,7 @@ semantic.o: semantic.c
 	gcc -g -c semantic.c
 tac.o: tac.c
 	gcc -g -c tac.c
-assembly.o: assembly.c
+assembly.o: assembly.h assembly.c
 	gcc -g -c assembly.c
 clean:
 	rm *.o

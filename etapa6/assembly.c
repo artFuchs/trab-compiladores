@@ -169,8 +169,7 @@ void createPRINT(TAC *tac, FILE *output){
   switch (tac->result->type){
     case SYMBOL_LIT_STRING:
       fprintf(output,
-              "\tleaq %s(%%rip), %%rdi\n"
-              "\tcall puts@PLT\n",
+              STR_PUTS,
               tac->result->text);
       break;
     case SYMBOL_LIT_INT:
