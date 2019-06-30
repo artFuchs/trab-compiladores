@@ -6,33 +6,33 @@
 #include "hash.h"
 #include "symbols.h"
 
-void declareStrings();
+void declareStrings(FILE *output);
 void fixIntVarNames();
 char* leapNumToInt(char *num);
-int createAssembly(TAC *tac);
-void createVARDECL(TAC *tac);
-void createBEGFUN(TAC *tac);
-void createENDFUN(TAC *tac);
-void createRETURN(TAC *tac);
-void createPRINT(TAC *tac);
+int createAssembly(TAC *tac, FILE *output);
+void createVARDECL(TAC *tac, FILE *output);
+void createBEGFUN(TAC *tac, FILE *output);
+void createENDFUN(TAC *tac, FILE *output);
+void createRETURN(TAC *tac, FILE *output);
+void createPRINT(TAC *tac, FILE *output);
 
 
-int tacToAssembly(TAC* tac){
+int tacToAssembly(TAC* tac, FILE* output){
   if (!tac) return 1;
 
-  declareStrings();
+  declareStrings(output);
   fixIntVarNames();
 
-  if (createAssembly(tac)) return 2;
+  if (createAssembly(tac, output)) return 2;
 
   return 0;
 }
 
 
-void declareStrings(){
+void declareStrings(FILE *output){
   int i=0;
   static int lbl_num = 0;
-  fprintf(stderr,
+  fprintf(output,
           "\t.text\n"
           "LCINT:\n"
           "\t.string \"%%d\"\n");
@@ -44,7 +44,7 @@ void declareStrings(){
         if (node->type == SYMBOL_LIT_STRING){
           char lbl_str [24];
           sprintf(lbl_str, "LC%d",lbl_num++);
-          fprintf(stderr,
+          fprintf(output,
                  "%s:\n"
                  "\t.string \"%s\"\n",
                  lbl_str,
@@ -102,25 +102,25 @@ char* leapNumToInt(char *num){
   return buffer;
 }
 
-int createAssembly(TAC *tac){
+int createAssembly(TAC *tac, FILE *output){
   if (!tac) return 0;
 
   switch (tac->instruction){
     case TAC_BYTE_DECL:
     case TAC_INT_DECL:
-    case TAC_FLOAT_DECL: createVARDECL(tac); break;
-    case TAC_BEGINFUN: createBEGFUN(tac); break;
-    case TAC_RETURN: createRETURN(tac); break;
-    case TAC_ENDFUN: createENDFUN(tac); break;
-    case TAC_PRINT: createPRINT(tac); break;
+    case TAC_FLOAT_DECL: createVARDECL(tac, output); break;
+    case TAC_BEGINFUN: createBEGFUN(tac, output); break;
+    case TAC_RETURN: createRETURN(tac, output); break;
+    case TAC_ENDFUN: createENDFUN(tac, output); break;
+    case TAC_PRINT: createPRINT(tac, output); break;
     default:  break;
   }
 
-  createAssembly(tac->next);
+  createAssembly(tac->next, output);
   return 0;
 }
 
-void createVARDECL(TAC *tac){
+void createVARDECL(TAC *tac, FILE *output){
   int size=4;
   char* varName;
   char zeros[8];
@@ -134,9 +134,11 @@ void createVARDECL(TAC *tac){
   }
   sprintf (zeros,".zero %d", size);
   if (tac->op1){
-    sprintf (val, ".long %s", leapNumToInt(tac->op1->text));
+    char *num = leapNumToInt(tac->op1->text);
+    sprintf (val, ".long %s", num);
+    free(num);
   }
-  fprintf(stderr,
+  fprintf(output,
           "\t.globl %s\n"
           "\t.align 4\n"
           "\t.size %s, %d\n"
@@ -146,8 +148,9 @@ void createVARDECL(TAC *tac){
           tac->op1?val:zeros);
 }
 
-void createBEGFUN(TAC *tac){
-  printf( "\t.text \n"
+void createBEGFUN(TAC *tac, FILE *output){
+  fprintf(output, 
+          "\t.text \n"
           "\t.globl	%s\n"
           "%s:\n"
           "\tpushq	%%rbp\n"
@@ -156,25 +159,26 @@ void createBEGFUN(TAC *tac){
           tac->result->text);
 }
 
-void createENDFUN(TAC *tac){
-  fprintf(stderr,
+void createENDFUN(TAC *tac, FILE *output){
+  fprintf(output,
           "\tpopq	%%rbp\n"
           "\tret \n"
           "\t.size %s, .-%s\n",
           tac->result->text, tac->result->text);
 }
 
-void createRETURN(TAC *tac){
+void createRETURN(TAC *tac, FILE *output){
   if (!strstr(tac->result->text,"__tempvar")){
-    printf("movl	%s(%%rip), %%eax \n",
-           tac->result->text);
+    fprintf(output,
+            "movl	%s(%%rip), %%eax \n",
+            tac->result->text);
   }
 }
 
-void createPRINT(TAC *tac){
+void createPRINT(TAC *tac, FILE *output){
   switch (tac->result->type){
     case SYMBOL_LIT_STRING:
-      fprintf(stderr,
+      fprintf(output,
               "\tleaq %s(%%rip), %%rdi\n"
               "\tcall puts@PLT\n",
               tac->result->text);
@@ -189,7 +193,7 @@ void createPRINT(TAC *tac){
         //deve pegar valores
       }
       else{
-        fprintf(stderr,
+        fprintf(output,
                 "\tmovl %s(%%rip), %%eax\n"
                 "\tmovl %%eax, %%esi\n"
                 "\tleaq LCINT(%%rip), %%rdi\n"

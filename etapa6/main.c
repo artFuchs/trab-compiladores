@@ -40,7 +40,7 @@ int main(int argc, char *argv[]){
 
 
   printTable();
-  decompile(global_ast, output);
+  //decompile(global_ast, output);
 
   int errors = 0;
   errors = fullSemanticCheck(global_ast);
@@ -52,8 +52,12 @@ int main(int argc, char *argv[]){
   TAC *taccode = genTac(global_ast);
   tacPrint(taccode);
 
-  printf("\n\tASSEMBLY:\n");
-  tacToAssembly(taccode);
+  fprintf(stderr, "generating assembly...\n");
+  if (tacToAssembly(taccode,output)){
+    fprintf(stderr, "error occured while generating assembly\n");
+    return 6;
+  }
+  fprintf(stderr, "successfuly generated assembly in file %s\n", argv[2]);
 
   return 0;
 }
