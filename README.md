@@ -110,8 +110,8 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
         - [ ] caso para literais inteiros e byten
         - [ ] caso para literais float
         - [ ] caso para literais char
-    - [ ] TAC_MOVE
+    - [X] TAC_MOVE
     - [ ] TAC_ARRAYW
     - [ ] TAC_ARRAYR
-    - [ ] TAC_ADD
+    - [X] TAC_ADD
     - [ ] TAC_SUB

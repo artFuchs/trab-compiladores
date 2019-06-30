@@ -17,6 +17,7 @@ void createENDFUN(TAC *tac, FILE *output);
 void createRETURN(TAC *tac, FILE *output);
 void createPRINT(TAC *tac, FILE *output);
 void createMOVE(TAC *tac, FILE *output);
+void createADD(TAC *tac, FILE *output);
 
 
 int tacToAssembly(TAC* tac, FILE* output){
@@ -131,6 +132,7 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_ENDFUN: createENDFUN(tac, output); break;
     case TAC_PRINT: createPRINT(tac, output); break;
     case TAC_MOVE: createMOVE(tac,output); break;
+    case TAC_ADD: createADD(tac,output); break;
     default:  break;
   }
 
@@ -151,6 +153,7 @@ void createVARDECL(TAC *tac, FILE *output){
     free(num);
   }
   fprintf(output,
+          "\t.data\n"
           "\t.globl %s\n"
           "\t.align 4\n"
           "%s:\n"
@@ -214,8 +217,77 @@ void createMOVE(TAC *tac, FILE *output){
     case SYMBOL_LIT_INT:
     case SYMBOL_LIT_BYTE:
       num = leapNumToInt(tac->op1->text);
+      fprintf(output,"\tmovl $%s, %s(%%rip)\n", num, tac->result->text);
       break;
     case SYMBOL_LIT_FLOAT:
       break;
+    case SYMBOL_VAR:
+      if (strstr(tac->op1->text, "__tempvar")){
+        fprintf(output,
+                "\tmovl %%eax, %s(%%rip)\n",
+                tac->result->text);
+      }else{
+        fprintf(output,
+                "\tmovl %s(%%rip), %%eax\n"
+                "\tmovl %%eax, %s(%%rip)\n"
+                ,tac->op1->text, tac->result->text);
+      }
+      break;
   }
+}
+
+void createADD(TAC *tac, FILE *output){
+  int fvar = tac->op1->type == SYMBOL_VAR;
+  int svar = tac->op2->type == SYMBOL_VAR;
+  int dvars = fvar && svar;
+  if (dvars){
+    fprintf(output,
+            "\tmovl %s(%%rip), %%edx\n"
+            "\tmovl %s(%%rip), %%eax\n"
+            "\taddl %%edx, %%eax\n",
+            tac->op1->text, tac->op2->text);
+  }else if (fvar){
+    char *num;
+    switch(tac->op2->type){
+      case SYMBOL_LIT_BYTE:
+      case SYMBOL_LIT_INT:
+        num = leapNumToInt(tac->op2->text);
+        fprintf(output,
+                "\tmovl %s(%%rip), %%eax\n"
+                "\taddl $%s, %%eax\n",
+                tac->op1->text, num);
+        free(num);
+    }
+  }else if (svar){
+    char *num;
+    switch(tac->op1->type){
+      case SYMBOL_LIT_BYTE:
+      case SYMBOL_LIT_INT:
+        num = leapNumToInt(tac->op1->text);
+        fprintf(output,
+                "\tmovl %s(%%rip), %%eax\n"
+                "\taddl $%s, %%eax\n",
+                tac->op2->text, num);
+        free(num);
+    }
+  }else{
+      char *num1, *num2;
+      if (tac->op1->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE)
+        num1 = leapNumToInt(tac->op1->text);
+      else
+        return;
+
+      if (tac->op2->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE)
+        num2 = leapNumToInt(tac->op1->text);
+      else
+        return;
+
+      fprintf(output,
+              "\tmovl $%s, %%eax\n"
+              "\taddl $%s, %%eax\n",
+              tac->op1->text, tac->op2->text);
+      free(num1);
+      free(num2);
+    }
+
 }

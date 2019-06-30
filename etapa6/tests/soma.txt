@@ -1,18 +1,12 @@
 ZZ Programa que soma dois numeros e imprime-os na tela
 
-int a = O;
-int b = O;
+int a = IO;
+int b = C;
 int ans = O;
 
 int main () {
-    print "digite o primeiro número: \n";
-    read a;
-    print "digite o segundo número: \n";
-    read b;
-    ans = a + b;
-    print "a soma de ", a, " e ", b, " é ", ans;
+    print "a vale: ", a, "\n";
+    print "b vale: ", b, "\n";
+    ans = a + H;
+    print "a soma de ", a, " e ", b, " é ", ans, "\n";
 };
-
-
-
-
