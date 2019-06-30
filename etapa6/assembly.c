@@ -6,6 +6,7 @@
 #include "hash.h"
 #include "symbols.h"
 
+void addMacMain();
 void declareStrings(FILE *output);
 void fixIntVarNames();
 char* leapNumToInt(char *num);
@@ -20,12 +21,27 @@ void createPRINT(TAC *tac, FILE *output);
 int tacToAssembly(TAC* tac, FILE* output){
   if (!tac) return 1;
 
+  addMacMain();
   declareStrings(output);
   fixIntVarNames();
 
   if (createAssembly(tac, output)) return 2;
 
   return 0;
+}
+
+void addMacMain(){
+  if (!MAC_MAIN) return;
+  int i;
+  for (i=0; i<HASH_SIZE; i++){
+    NODE* node = Table[i];
+    while (node){
+      if (node->type == SYMBOL_FUNC && strcmp(node->text,"main")){
+        strcpy(node->text,"_main");
+      }
+      node = node->next;
+    }
+  }
 }
 
 
@@ -169,7 +185,7 @@ void createPRINT(TAC *tac, FILE *output){
   switch (tac->result->type){
     case SYMBOL_LIT_STRING:
       fprintf(output,
-              STR_PUTS,
+              STR_PRINT,
               tac->result->text);
       break;
     case SYMBOL_LIT_INT:
@@ -183,11 +199,7 @@ void createPRINT(TAC *tac, FILE *output){
       }
       else{
         fprintf(output,
-                "\tmovl %s(%%rip), %%eax\n"
-                "\tmovl %%eax, %%esi\n"
-                "\tleaq LCINT(%%rip), %%rdi\n"
-                "\tmovl $0, %%eax\n"
-                "\tcall printf@PLT\n",
+                STR_PRINT_NUM,
                 tac->result->text);
       }
       break;
