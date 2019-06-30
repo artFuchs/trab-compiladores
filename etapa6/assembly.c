@@ -126,12 +126,6 @@ void createVARDECL(TAC *tac, FILE *output){
   char zeros[8];
   char val[28] = "0";
   varName = tac->result->text;
-  switch(tac->instruction){
-    case TAC_BYTE_DECL: size = 1; break;
-    case TAC_INT_DECL:
-    case TAC_FLOAT_DECL: size = 4; break;
-    default: return;
-  }
   sprintf (zeros,".zero %d", size);
   if (tac->op1){
     char *num = leapNumToInt(tac->op1->text);
@@ -142,9 +136,8 @@ void createVARDECL(TAC *tac, FILE *output){
           "\t.globl %s\n"
           "\t.align 4\n"
           "%s:\n"
-          "\t%s\n"
-          ,varName, varName, size, varName,
-          tac->op1?val:zeros);
+          "\t%s\n",
+          varName, varName, tac->op1?val:zeros);
 }
 
 void createBEGFUN(TAC *tac, FILE *output){
@@ -161,8 +154,7 @@ void createBEGFUN(TAC *tac, FILE *output){
 void createENDFUN(TAC *tac, FILE *output){
   fprintf(output,
           "\tpopq	%%rbp\n"
-          "\tret \n"
-          tac->result->text, tac->result->text);
+          "\tret \n");
 }
 
 void createRETURN(TAC *tac, FILE *output){
