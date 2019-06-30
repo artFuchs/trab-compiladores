@@ -11,6 +11,7 @@
 #include "ast.h"
 #include "semantic.h"
 #include "tac.h"
+#include "assembly.h"
 
 void initMe();
 extern FILE *yyin;
@@ -50,6 +51,9 @@ int main(int argc, char *argv[]){
 
   TAC *taccode = genTac(global_ast);
   tacPrint(taccode);
+
+  printf("\n\tASSEMBLY:\n");
+  tacToAssembly(taccode);
 
   return 0;
 }

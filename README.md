@@ -87,3 +87,7 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
 - [ ] avaliação de quais são os códigos correspondentes para cada instrução da
 TAC em assembly AT&T ;
 - [ ] fazer a geração de assembly para cada TAC;
+   - TAC_BEGINFUN
+   - TAC_ENDFUN
+   - TAC_RETURN (não verificando)
+   - TAC_PRINT (apenas para literais)
