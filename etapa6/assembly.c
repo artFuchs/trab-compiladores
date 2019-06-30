@@ -88,9 +88,6 @@ void createRETURN(TAC *tac){
   if (!strstr(tac->result->text,"__tempvar")){
     printf("movl	%s(%%rip), %%eax \n",
            tac->result->text);
-  }else{
-    //caso para fazer return de variaveis
-  }
 }
 
 void createPRINT(TAC *tac){

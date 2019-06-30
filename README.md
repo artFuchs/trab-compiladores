@@ -89,5 +89,5 @@ TAC em assembly AT&T ;
 - [ ] fazer a geração de assembly para cada TAC;
    - TAC_BEGINFUN
    - TAC_ENDFUN
-   - TAC_RETURN (não verificando)
-   - TAC_PRINT (apenas para literais)
+   - TAC_RETURN
+   - TAC_PRINT (apenas para literais string)
