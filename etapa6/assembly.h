@@ -29,21 +29,22 @@ int tacToAssembly(TAC *tac, FILE* output);
 #define MAC_MAIN 1
 
 #define STR_PRINT "\tleaq	%s(%%rip), %%rdi\n"\
-	               "\txorl	%%eax, %%eax\n"\
-	               "\tmovb	%%al, %%cl\n"\
-	               "\tmovl	%%eax, -8(%%rbp)          ## 4-byte Spill\n"\
-	               "\tmovb	%%cl, %%al\n"\
-	               "\tcallq	_printf\n"\
-                 "\tmovl	-8(%%rbp), %%edi          ## 4-byte Reload\n"
+				  "\txorl	%%eax, %%eax\n"\
+				  "\tmovb	%%al, %%cl\n"\
+				  "\tmovl	%%eax, -8(%%rbp)          ## 4-byte Spill\n"\
+				  "\tmovb	%%cl, %%al\n"\
+				  "\tcallq	_printf\n"\
+				  "\tmovl	-8(%%rbp), %%edi          ## 4-byte Reload\n"
 
-#define STR_PRINT_NUM "\tleaq	%s(%%rip), %%rdi\n"\
-	                    "\txorl	%%eax, %%eax\n"\
-	                    "\tmovb	%%al, %%cl\n"\
-	                    "\tmovl	%%eax, -8(%%rbp)          ## 4-byte Spill\n"\
-	                    "\tmovb	%%cl, %%al\n"\
-	                    "\tcallq	_printf\n"\
-                      "\tmovl	-8(%%rbp), %%edi          ## 4-byte Reload\n"
-
+#define STR_PRINT_NUM "\tmovl %s(%%rip), %%esi\n"\
+					  "\tleaq LCINT(%%rip), %%rdi\n"\
+					  "\txorl %%eax, %%eax\n"\
+					  "\tmovb %%al, %%cl\n"\
+					  "\tmovl %%eax, -8(%%rbp)          ## 4-byte Spill\n"\
+					  "\tmovb %%cl, %%al\n"\
+					  "\tcallq _printf\n"\
+					  "\tmovl -8(%%rbp), %%edi          ## 4-byte Reload\n"\
+					  "\tmovl %%eax, -12(%%rbp)         ## 4-byte Spill\n"
 #endif
 
 
