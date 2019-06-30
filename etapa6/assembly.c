@@ -16,6 +16,7 @@ void createBEGFUN(TAC *tac, FILE *output);
 void createENDFUN(TAC *tac, FILE *output);
 void createRETURN(TAC *tac, FILE *output);
 void createPRINT(TAC *tac, FILE *output);
+void createMOVE(TAC *tac, FILE *output);
 
 
 int tacToAssembly(TAC* tac, FILE* output){
@@ -129,6 +130,7 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_RETURN: createRETURN(tac, output); break;
     case TAC_ENDFUN: createENDFUN(tac, output); break;
     case TAC_PRINT: createPRINT(tac, output); break;
+    case TAC_MOVE: createMOVE(tac,output); break;
     default:  break;
   }
 
@@ -202,6 +204,18 @@ void createPRINT(TAC *tac, FILE *output){
                 STR_PRINT_NUM,
                 tac->result->text);
       }
+      break;
+  }
+}
+
+void createMOVE(TAC *tac, FILE *output){
+  char* num;
+  switch (tac->op1->type){
+    case SYMBOL_LIT_INT:
+    case SYMBOL_LIT_BYTE:
+      num = leapNumToInt(tac->op1->text);
+      break;
+    case SYMBOL_LIT_FLOAT:
       break;
   }
 }

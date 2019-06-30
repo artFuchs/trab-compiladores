@@ -85,7 +85,7 @@ labels, retornando um trecho de código completo desse novo nodo;
 ## Etapa 6
 A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
 - [X] gerar arquivo de saída;
-- [ ] fazer a geração de assembly para cada TAC;
+- [ ] fazer a geração de assembly para cada TAC, em linux e MAC;
    - [X] TAC_INT_DECL
    - [X] TAC_BYTE_DECL
    - [ ] TAC_FLOAT_DECL
@@ -96,9 +96,22 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
    - [X] TAC_ENDFUN
    - [X] TAC_RETURN
    - [ ] TAC_PRINT (apenas para literais string)
-      - [X] caso para literais string
-      - [X] caso para variaveis
-      - [X] caso para variaveis temporárias
-      - [ ] caso para literais inteiros e byten
-      - [ ] caso para literais float
-      - [ ] caso para literais char
+      - linux
+        - [X] caso para literais string
+        - [X] caso para variaveis
+        - [ ] caso para variaveis temporárias
+        - [ ] caso para literais inteiros e byten
+        - [ ] caso para literais float
+        - [ ] caso para literais char
+      - mac
+        - [X] caso para literais string
+        - [ ] caso para variaveis
+        - [ ] caso para variaveis temporárias
+        - [ ] caso para literais inteiros e byten
+        - [ ] caso para literais float
+        - [ ] caso para literais char
+    - [ ] TAC_MOVE
+    - [ ] TAC_ARRAYW
+    - [ ] TAC_ARRAYR
+    - [ ] TAC_ADD
+    - [ ] TAC_SUB
