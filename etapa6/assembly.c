@@ -141,7 +141,6 @@ void createVARDECL(TAC *tac, FILE *output){
   fprintf(output,
           "\t.globl %s\n"
           "\t.align 4\n"
-          "\t.size %s, %d\n"
           "%s:\n"
           "\t%s\n"
           ,varName, varName, size, varName,
@@ -149,7 +148,7 @@ void createVARDECL(TAC *tac, FILE *output){
 }
 
 void createBEGFUN(TAC *tac, FILE *output){
-  fprintf(output, 
+  fprintf(output,
           "\t.text \n"
           "\t.globl	%s\n"
           "%s:\n"
@@ -163,7 +162,6 @@ void createENDFUN(TAC *tac, FILE *output){
   fprintf(output,
           "\tpopq	%%rbp\n"
           "\tret \n"
-          "\t.size %s, .-%s\n",
           tac->result->text, tac->result->text);
 }
 
