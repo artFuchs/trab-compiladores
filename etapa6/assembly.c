@@ -36,7 +36,7 @@ void addMacMain(){
   for (i=0; i<HASH_SIZE; i++){
     NODE* node = Table[i];
     while (node){
-      if (node->type == SYMBOL_FUNC && strcmp(node->text,"main")){
+      if (node->type == SYMBOL_FUNC && !strcmp(node->text,"main")){
         strcpy(node->text,"_main");
       }
       node = node->next;
