@@ -9,4 +9,5 @@ int main () {
     print "b vale: ", b, "\n";
     ans = a + H;
     print "a soma de ", a, " e ", b, " é ", ans, "\n";
+    print "cinco = ", E, "\n";
 };

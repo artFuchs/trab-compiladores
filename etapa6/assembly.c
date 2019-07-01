@@ -187,6 +187,7 @@ void createRETURN(TAC *tac, FILE *output){
 }
 
 void createPRINT(TAC *tac, FILE *output){
+  char* num;
   switch (tac->result->type){
     case SYMBOL_LIT_STRING:
       fprintf(output,
@@ -196,15 +197,20 @@ void createPRINT(TAC *tac, FILE *output){
     case SYMBOL_LIT_INT:
     case SYMBOL_LIT_FLOAT:
     case SYMBOL_LIT_BYTE:
+      num = leapNumToInt(tac->result->text);
+      fprintf(output,
+              STR_PRINT_NUM,
+              num);
+      free(num);
       break;
     case SYMBOL_VAR:
       if (strstr(tac->result->text,"__tempvar")){
         //caso para tempvars
-        //deve pegar valores
+        //deve pegar valores de expressões
       }
       else{
         fprintf(output,
-                STR_PRINT_NUM,
+                STR_PRINT_VAR,
                 tac->result->text);
       }
       break;
@@ -218,6 +224,7 @@ void createMOVE(TAC *tac, FILE *output){
     case SYMBOL_LIT_BYTE:
       num = leapNumToInt(tac->op1->text);
       fprintf(output,"\tmovl $%s, %s(%%rip)\n", num, tac->result->text);
+      free(num);
       break;
     case SYMBOL_LIT_FLOAT:
       break;

@@ -17,8 +17,12 @@ int tacToAssembly(TAC *tac, FILE* output);
                  "\tmovl $0, %%eax\n"\
                  "\tcall printf@PLT\n"
 
-#define STR_PRINT_NUM "\tmovl %s(%%rip), %%eax\n"\
-                      "\tmovl %%eax, %%esi\n"\
+#define STR_PRINT_VAR "\tmovl %s(%%rip), %%esi\n"\
+                      "\tleaq LCINT(%%rip), %%rdi\n"\
+                      "\tmovl $0, %%eax\n"\
+                      "\tcall printf@PLT\n"
+
+#define STR_PRINT_NUM "\tmovl $%s, %%esi\n"\
                       "\tleaq LCINT(%%rip), %%rdi\n"\
                       "\tmovl $0, %%eax\n"\
                       "\tcall printf@PLT\n"
@@ -36,7 +40,17 @@ int tacToAssembly(TAC *tac, FILE* output);
 				  "\tcallq	_printf\n"\
 				  "\tmovl	-8(%%rbp), %%edi          ## 4-byte Reload\n"
 
-#define STR_PRINT_NUM "\tmovl %s(%%rip), %%esi\n"\
+#define STR_PRINT_VAR "\tmovl %s(%%rip), %%esi\n"\
+					  "\tleaq LCINT(%%rip), %%rdi\n"\
+					  "\txorl %%eax, %%eax\n"\
+					  "\tmovb %%al, %%cl\n"\
+					  "\tmovl %%eax, -8(%%rbp)          ## 4-byte Spill\n"\
+					  "\tmovb %%cl, %%al\n"\
+					  "\tcallq _printf\n"\
+					  "\tmovl -8(%%rbp), %%edi          ## 4-byte Reload\n"\
+					  "\tmovl %%eax, -12(%%rbp)         ## 4-byte Spill\n"
+
+#define STR_PRINT_NUM "\tmovl $%s, %%esi\n"\
 					  "\tleaq LCINT(%%rip), %%rdi\n"\
 					  "\txorl %%eax, %%eax\n"\
 					  "\tmovb %%al, %%cl\n"\
