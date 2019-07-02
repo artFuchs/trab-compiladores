@@ -115,8 +115,8 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
     - [ ] TAC_ARRAYR
     - [X] TAC_ADD
     - [X] TAC_SUB
-    - [ ] TAC_MUL
-    - [ ] TAC_DIV
+    - [X] TAC_MUL
+    - [X] TAC_DIV
     - [ ] TAC_AND
     - [ ] TAC_OR
     - [ ] TAC_NOT

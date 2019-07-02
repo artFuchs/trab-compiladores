@@ -1,0 +1,18 @@
+int a = GO;
+int b = G;
+int ans = O;
+
+int main () {
+    print "a vale: ", a, "\n";
+    print "b vale: ", b, "\n";
+    ans = a / b;
+    print "a / b = ", ans, "\n";
+    ans = E / H;
+    print "5 / 2 = ", ans, "\n";
+    ans = H / E;
+    print "2 / 5 = ", ans, "\n";
+    ans = a / E;
+    print "a / 5 = ", ans, "\n";
+    ans = CO / a;
+    print "70 / a = ", ans, "\n";
+};

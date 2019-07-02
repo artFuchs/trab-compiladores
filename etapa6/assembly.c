@@ -18,6 +18,7 @@ void createRETURN(TAC *tac, FILE *output);
 void createPRINT(TAC *tac, FILE *output);
 void createMOVE(TAC *tac, FILE *output);
 void createBinop(int op, TAC *tac, FILE *output);
+void createDIV(TAC* tac, FILE* output);
 
 
 int tacToAssembly(TAC* tac, FILE* output){
@@ -133,7 +134,11 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_PRINT: createPRINT(tac, output); break;
     case TAC_MOVE: createMOVE(tac, output); break;
     case TAC_ADD:
-    case TAC_SUB: createBinop(tac->instruction, tac, output); break;
+    case TAC_SUB:
+    case TAC_MUL:
+      createBinop(tac->instruction, tac, output); break;
+    case TAC_DIV: createDIV(tac,output); break;
+
     default:  break;
   }
 
@@ -268,6 +273,9 @@ void createBinopVar(int op, FILE *output){
       fprintf(output, "\tsubl %%eax, %%edx\n"
                       "\tmovl %%edx, %%eax\n");
       break;
+    case TAC_MUL:
+      fprintf(output, "\timul %%edx, %%eax\n");
+      break;
   }
 }
 
@@ -278,6 +286,9 @@ void createBinopNum(int op, char* num, FILE *output){
       break;
     case TAC_SUB:
       fprintf(output, "\tsubl $%s, %%eax\n", num);
+      break;
+    case TAC_MUL:
+      fprintf(output, "\timul $%s, %%eax\n", num);
       break;
   }
 }
@@ -334,4 +345,30 @@ void createBinop(int op, TAC *tac, FILE *output){
       free(num1);
       free(num2);
     }
+}
+
+void createDIV(TAC* tac, FILE* output){
+  int fvar = tac->op1->type == SYMBOL_VAR;
+  int svar = tac->op2->type == SYMBOL_VAR;
+  char *num1 = NULL;
+  char *num2 = NULL;
+  if (fvar){
+    fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
+  }else if (tac->op1->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE){
+    num1 = leapNumToInt(tac->op1->text);
+    fprintf(output, "\tmovl $%s, %%eax\n", num1);
+  }else return;
+
+  if (svar){
+    fprintf(output, "\tmovl %s(%%rip), %%esi\n", tac->op2->text);
+  }else if (tac->op2->type == SYMBOL_LIT_INT || tac->op2->type == SYMBOL_LIT_BYTE){
+    num2 = leapNumToInt(tac->op2->text);
+    fprintf(output, "\tmovl $%s, %%esi\n", num2);
+  }else return;
+
+  fprintf(output, "\tcltd\n"
+                  "\tidivl %%esi\n");
+
+  free(num1);
+  free(num2);
 }

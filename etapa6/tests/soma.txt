@@ -14,6 +14,4 @@ int main () {
     ans = C + a;
     print "a soma de 7 com a variável a é: ", ans, "\n";
     print "a soma de a e 5 (imprimindo direto) é:", (a + E), "\n";
-
-    print "cinco = ", E, "\n";
 };
