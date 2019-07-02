@@ -95,23 +95,33 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
    - [X] TAC_BEGINFUN
    - [X] TAC_ENDFUN
    - [X] TAC_RETURN
-   - [ ] TAC_PRINT (apenas para literais string)
+   - [X] TAC_PRINT
       - linux
         - [X] caso para literais string
         - [X] caso para variaveis
-        - [ ] caso para variaveis temporárias
-        - [ ] caso para literais inteiros e byten
+        - [ ] caso para expressões aritméticas - tem que arrumar a TAC
+        - [X] caso para literais inteiros e byte
         - [ ] caso para literais float
         - [ ] caso para literais char
       - mac
         - [X] caso para literais string
         - [ ] caso para variaveis
-        - [ ] caso para variaveis temporárias
-        - [ ] caso para literais inteiros e byten
+        - [ ] caso para expressões aritméticas - tem que arrumar a TAC
+        - [ ] caso para literais inteiros e byte
         - [ ] caso para literais float
         - [ ] caso para literais char
     - [X] TAC_MOVE
     - [ ] TAC_ARRAYW
     - [ ] TAC_ARRAYR
     - [X] TAC_ADD
-    - [ ] TAC_SUB
+    - [X] TAC_SUB
+    - [ ] TAC_MUL
+    - [ ] TAC_DIV
+    - [ ] TAC_AND
+    - [ ] TAC_OR
+    - [ ] TAC_NOT
+    - [ ] TAC_LT
+    - [ ] TAC_GT
+    - [ ] TAC_LE
+    - [ ] TAC_EQ
+    - [ ] TAC_NEQ

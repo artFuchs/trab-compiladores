@@ -17,7 +17,7 @@ void createENDFUN(TAC *tac, FILE *output);
 void createRETURN(TAC *tac, FILE *output);
 void createPRINT(TAC *tac, FILE *output);
 void createMOVE(TAC *tac, FILE *output);
-void createADD(TAC *tac, FILE *output);
+void createBinop(int op, TAC *tac, FILE *output);
 
 
 int tacToAssembly(TAC* tac, FILE* output){
@@ -131,8 +131,9 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_RETURN: createRETURN(tac, output); break;
     case TAC_ENDFUN: createENDFUN(tac, output); break;
     case TAC_PRINT: createPRINT(tac, output); break;
-    case TAC_MOVE: createMOVE(tac,output); break;
-    case TAC_ADD: createADD(tac,output); break;
+    case TAC_MOVE: createMOVE(tac, output); break;
+    case TAC_ADD:
+    case TAC_SUB: createBinop(tac->instruction, tac, output); break;
     default:  break;
   }
 
@@ -179,15 +180,28 @@ void createENDFUN(TAC *tac, FILE *output){
 }
 
 void createRETURN(TAC *tac, FILE *output){
-  if (!strstr(tac->result->text,"__tempvar")){
-    fprintf(output,
-            "movl	%s(%%rip), %%eax \n",
-            tac->result->text);
+  char *num = NULL;
+  switch (tac->result->type){
+      case SYMBOL_LIT_INT:
+      case SYMBOL_LIT_BYTE:
+        num = leapNumToInt(tac->result->text);
+        fprintf(output,
+                "movl	$%s, %%eax \n",
+                num);
+        break;
+      case SYMBOL_VAR:
+        if (!strstr(tac->result->text,"__tempvar")){
+          fprintf(output,
+                  "movl	%s(%%rip), %%eax \n",
+                  tac->result->text);
+        }
+        break;
   }
+  free(num);
 }
 
 void createPRINT(TAC *tac, FILE *output){
-  char* num;
+  char* num = NULL;
   switch (tac->result->type){
     case SYMBOL_LIT_STRING:
       fprintf(output,
@@ -205,8 +219,10 @@ void createPRINT(TAC *tac, FILE *output){
       break;
     case SYMBOL_VAR:
       if (strstr(tac->result->text,"__tempvar")){
-        //caso para tempvars
-        //deve pegar valores de expressões
+        fprintf(output,"\tmovl %%eax, %%esi\n");
+        fprintf(output,
+                STR_PRINT,
+                "LCINT");
       }
       else{
         fprintf(output,
@@ -218,7 +234,7 @@ void createPRINT(TAC *tac, FILE *output){
 }
 
 void createMOVE(TAC *tac, FILE *output){
-  char* num;
+  char* num = NULL;
   switch (tac->op1->type){
     case SYMBOL_LIT_INT:
     case SYMBOL_LIT_BYTE:
@@ -243,58 +259,79 @@ void createMOVE(TAC *tac, FILE *output){
   }
 }
 
-void createADD(TAC *tac, FILE *output){
+void createBinopVar(int op, FILE *output){
+  switch (op){
+    case TAC_ADD:
+      fprintf(output, "\taddl %%edx, %%eax\n");
+      break;
+    case TAC_SUB:
+      fprintf(output, "\tsubl %%eax, %%edx\n"
+                      "\tmovl %%edx, %%eax\n");
+      break;
+  }
+}
+
+void createBinopNum(int op, char* num, FILE *output){
+  switch (op){
+    case TAC_ADD:
+      fprintf(output, "\taddl $%s, %%eax\n", num);
+      break;
+    case TAC_SUB:
+      fprintf(output, "\tsubl $%s, %%eax\n", num);
+      break;
+  }
+}
+
+void createBinop(int op, TAC *tac, FILE *output){
   int fvar = tac->op1->type == SYMBOL_VAR;
   int svar = tac->op2->type == SYMBOL_VAR;
   int dvars = fvar && svar;
   if (dvars){
     fprintf(output,
             "\tmovl %s(%%rip), %%edx\n"
-            "\tmovl %s(%%rip), %%eax\n"
-            "\taddl %%edx, %%eax\n",
+            "\tmovl %s(%%rip), %%eax\n",
             tac->op1->text, tac->op2->text);
+    createBinopVar(op, output);
   }else if (fvar){
-    char *num;
+    char *num = NULL;
     switch(tac->op2->type){
       case SYMBOL_LIT_BYTE:
       case SYMBOL_LIT_INT:
         num = leapNumToInt(tac->op2->text);
-        fprintf(output,
-                "\tmovl %s(%%rip), %%eax\n"
-                "\taddl $%s, %%eax\n",
-                tac->op1->text, num);
+        fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
+        createBinopNum(op, num, output);
         free(num);
     }
   }else if (svar){
-    char *num;
+    char *num = NULL;
     switch(tac->op1->type){
       case SYMBOL_LIT_BYTE:
       case SYMBOL_LIT_INT:
         num = leapNumToInt(tac->op1->text);
-        fprintf(output,
-                "\tmovl %s(%%rip), %%eax\n"
-                "\taddl $%s, %%eax\n",
-                tac->op2->text, num);
-        free(num);
+        fprintf(output, "\tmovl $%s, %%edx\n", num);
+        fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op2->text);
+        createBinopVar(op, output);
     }
+    free(num);
   }else{
-      char *num1, *num2;
+      char *num1 = NULL;
+      char *num2 = NULL;
       if (tac->op1->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE)
         num1 = leapNumToInt(tac->op1->text);
       else
         return;
 
-      if (tac->op2->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE)
-        num2 = leapNumToInt(tac->op1->text);
-      else
+      if (tac->op2->type == SYMBOL_LIT_INT || tac->op2->type == SYMBOL_LIT_BYTE)
+        num2 = leapNumToInt(tac->op2->text);
+      else{
+        free(num1);
         return;
+      }
 
-      fprintf(output,
-              "\tmovl $%s, %%eax\n"
-              "\taddl $%s, %%eax\n",
-              tac->op1->text, tac->op2->text);
+      fprintf(output, "\tmovl $%s, %%eax\n", num1);
+      createBinopNum(op,num2,output);
+
       free(num1);
       free(num2);
     }
-
 }

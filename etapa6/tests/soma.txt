@@ -1,5 +1,3 @@
-ZZ Programa que soma dois numeros e imprime-os na tela
-
 int a = IO;
 int b = C;
 int ans = O;
@@ -7,7 +5,15 @@ int ans = O;
 int main () {
     print "a vale: ", a, "\n";
     print "b vale: ", b, "\n";
-    ans = a + H;
-    print "a soma de ", a, " e ", b, " é ", ans, "\n";
+    ans = a + b;
+    print "a soma da variável a  e da variável b é: ", ans, "\n";
+    ans = I + E;
+    print "a soma de 1 e 5 é: ", ans, "\n";
+    ans = a + E;
+    print "a soma da variável a e 5 é: ", ans, "\n";
+    ans = C + a;
+    print "a soma de 7 com a variável a é: ", ans, "\n";
+    print "a soma de a e 5 (imprimindo direto) é:", (a + E), "\n";
+
     print "cinco = ", E, "\n";
 };
