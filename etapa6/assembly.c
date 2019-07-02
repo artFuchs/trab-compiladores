@@ -373,30 +373,40 @@ void createBinop(int op, TAC *tac, FILE *output){
   int svar = tac->op2->type == SYMBOL_VAR;
   int dvars = fvar && svar;
   if (dvars){
-    fprintf(output,
-            "\tmovl %s(%%rip), %%edx\n"
-            "\tmovl %s(%%rip), %%eax\n",
-            tac->op1->text, tac->op2->text);
+
+    if (strstr(tac->op1->text, "__tempvar")){
+      fprintf(output, "\tmovl %s(%%rip), %%edx\n", tac->op2->text);
+    }
+    else if (strstr(tac->op2->text, "__tempvar")){
+      fprintf(output, "\tmovl %s(%%rip), %%edx\n", tac->op1->text);
+    }else{
+      fprintf(output, "\tmovl %s(%%rip), %%edx\n"
+                      "\tmovl %s(%%rip), %%eax\n",
+                      tac->op1->text, tac->op2->text);
+    }
     createBinopVar(op, output);
+
   }else if (fvar){
     char *num = NULL;
     switch(tac->op2->type){
       case SYMBOL_LIT_BYTE:
       case SYMBOL_LIT_INT:
         num = leapNumToInt(tac->op2->text);
-        fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
+        if (!strstr(tac->op1->text, "__tempvar"))
+          fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
         createBinopNum(op, num, output);
-        free(num);
+
     }
+    free(num);
   }else if (svar){
     char *num = NULL;
     switch(tac->op1->type){
       case SYMBOL_LIT_BYTE:
       case SYMBOL_LIT_INT:
         num = leapNumToInt(tac->op1->text);
-        fprintf(output, "\tmovl $%s, %%edx\n", num);
-        fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op2->text);
-        createBinopVar(op, output);
+        if (!strstr(tac->op2->text, "__tempvar"))
+          fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op2->text);
+        createBinopNum(op, num, output);
     }
     free(num);
   }else{
@@ -427,19 +437,20 @@ void createDIV(TAC* tac, FILE* output){
   int svar = tac->op2->type == SYMBOL_VAR;
   char *num1 = NULL;
   char *num2 = NULL;
-  if (fvar){
+
+  if (fvar && !strstr(tac->op1->text, "__tempvar")){
     fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
   }else if (tac->op1->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE){
     num1 = leapNumToInt(tac->op1->text);
     fprintf(output, "\tmovl $%s, %%eax\n", num1);
-  }else return;
+  }
 
   if (svar){
     fprintf(output, "\tmovl %s(%%rip), %%esi\n", tac->op2->text);
   }else if (tac->op2->type == SYMBOL_LIT_INT || tac->op2->type == SYMBOL_LIT_BYTE){
     num2 = leapNumToInt(tac->op2->text);
     fprintf(output, "\tmovl $%s, %%esi\n", num2);
-  }else return;
+  }
 
   fprintf(output, "\tcltd\n"
                   "\tidivl %%esi\n");
