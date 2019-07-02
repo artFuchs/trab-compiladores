@@ -330,15 +330,39 @@ void createBinopNum(int op, char* num, FILE *output){
       fprintf(output, "\timul $%s, %%eax\n", num);
       break;
     case TAC_GT:
-      fprintf(output, "\tmovl $%s, %%eax\n"
-                      "\tcmpl %%eax, %%edx\n"
+      fprintf(output, "\tmovl $%s, %%edx\n"
+                      "\tcmpl %%edx, %%eax\n"
                       "\tsetg %%al\n"
                       "\tmovzbl %%al, %%eax\n", num);
       break;
     case TAC_LT:
-      fprintf(output, "\tmovl $%s, %%eax\n"
-                      "\tcmpl %%eax, %%edx\n"
+      fprintf(output, "\tmovl $%s, %%edx\n"
+                      "\tcmpl %%edx, %%eax\n"
                       "\tsetl %%al\n"
+                      "\tmovzbl %%al, %%eax\n", num);
+      break;
+    case TAC_GE:
+      fprintf(output, "\tmovl $%s, %%edx\n"
+                      "\tcmpl %%edx, %%eax\n"
+                      "\tsetge %%al\n"
+                      "\tmovzbl %%al, %%eax\n", num);
+      break;
+    case TAC_LE:
+      fprintf(output, "\tmovl $%s, %%edx\n"
+                      "\tcmpl %%edx, %%eax\n"
+                      "\tsetle %%al\n"
+                      "\tmovzbl %%al, %%eax\n", num);
+      break;
+    case TAC_EQ:
+      fprintf(output, "\tmovl $%s, %%edx\n"
+                      "\tcmpl %%edx, %%eax\n"
+                      "\tsete %%al\n"
+                      "\tmovzbl %%al, %%eax\n", num);
+      break;
+    case TAC_NEQ:
+      fprintf(output, "\tmovl $%s, %%edx\n"
+                      "\tcmpl %%edx, %%eax\n"
+                      "\tsetne %%al\n"
                       "\tmovzbl %%al, %%eax\n", num);
       break;
   }

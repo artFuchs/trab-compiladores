@@ -1,19 +1,109 @@
-int a=H;
+int a=E;
+int b=C;
+int c=O;
 
 int main(){
-  print "a: ", a, "\n";
+  print "a:", a, "\n";
+
   if (a < E) then {
-    print "a < 5\n";
-  } else {
-    print "a > 5\n";
+    print "a < ", a, "\n";
+  };
+  if (a <= E) then {
+    print "a <= ", a, "\n";
+  };
+  if (a >= E) then {
+    print "a >= ", a, "\n";
+  };
+  if (a > E) then {
+    print "a > ", a, "\n";
+  };
+  if (a == E) then {
+    print "a == ", a, "\n";
+  };
+  if (a != E) then {
+    print "a != ", a, "\n";
   };
 
-  if (a<I) then {
-    print "a < 1\n";
-  };
 
+
+  if (a < H) then {
+    print "a < ", H, "\n";
+  };
+  if (a <= H) then {
+    print "a <= ", H, "\n";
+  };
+  if (a >= H) then {
+    print "a >= ", H, "\n";
+  };
+  if (a > H) then {
+    print "a > ", H, "\n";
+  };
   if (a == H) then {
-    print "a = 2\n";
+    print "a == ", H, "\n";
+  };
+  if (a != H) then {
+    print "a != ", H, "\n";
+  };
+
+
+  if (a < A) then {
+    print "a < ", A, "\n";
+  };
+  if (a <= A) then {
+    print "a <= ", A, "\n";
+  };
+  if (a >= A) then {
+    print "a >= ", A, "\n";
+  };
+  if (a > A) then {
+    print "a > ", A, "\n";
+  };
+  if (a == A) then {
+    print "a == ", A, "\n";
+  };
+  if (a != A) then {
+    print "a != ", A, "\n";
+  };
+
+  print "b:", b, "\n";
+  print "c:", c, "\n";
+
+  if (a < b) then {
+    print "a < ", b, "\n";
+  };
+  if (a <= b) then {
+    print "a <= ", b, "\n";
+  };
+  if (a >= b) then {
+    print "a >= ", b, "\n";
+  };
+  if (a > b) then {
+    print "a > ", b, "\n";
+  };
+  if (a == b) then {
+    print "a == ", b, "\n";
+  };
+  if (a != b) then {
+    print "a != ", b, "\n";
+  };
+
+  if (a < c) then {
+    print "a < ", c, "\n";
+  };
+  if (a <= c) then {
+    print "a <= ", c, "\n";
+  };
+  if (a >= c) then {
+    print "a >= ", c, "\n";
+  };
+  if (a > c) then {
+    print "a > ", c, "\n";
+  };
+  if (a == c) then {
+    print "a == ", c, "\n";
+  };
+  if (a != c) then {
+    print "a != ", c, "\n";
   };
 
 
