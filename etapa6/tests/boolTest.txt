@@ -1,0 +1,20 @@
+int a=H;
+
+int main(){
+  print "a: ", a, "\n";
+  if (a < E) then {
+    print "a < 5\n";
+  } else {
+    print "a > 5\n";
+  };
+
+  if (a<I) then {
+    print "a < 1\n";
+  };
+
+  if (a == H) then {
+    print "a = 2\n";
+  };
+
+
+};

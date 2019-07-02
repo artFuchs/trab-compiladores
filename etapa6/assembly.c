@@ -19,7 +19,7 @@ void createPRINT(TAC *tac, FILE *output);
 void createMOVE(TAC *tac, FILE *output);
 void createBinop(int op, TAC *tac, FILE *output);
 void createDIV(TAC* tac, FILE* output);
-
+void createIFZ(TAC* tac, FILE* output);
 
 int tacToAssembly(TAC* tac, FILE* output){
   if (!tac) return 1;
@@ -136,8 +136,16 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_ADD:
     case TAC_SUB:
     case TAC_MUL:
+    case TAC_LT:
+    case TAC_GT:
+    case TAC_LE:
+    case TAC_GE:
+    case TAC_EQ:
+    case TAC_NEQ:
       createBinop(tac->instruction, tac, output); break;
     case TAC_DIV: createDIV(tac,output); break;
+    case TAC_IFZ: createIFZ(tac, output); break;
+    case TAC_LABEL: fprintf(output, "%s:\n", tac->result->text); break;
 
     default:  break;
   }
@@ -276,6 +284,36 @@ void createBinopVar(int op, FILE *output){
     case TAC_MUL:
       fprintf(output, "\timul %%edx, %%eax\n");
       break;
+    case TAC_GT:
+      fprintf(output, "\tcmpl %%eax, %%edx\n"
+                      "\tsetg %%al\n"
+                      "\tmovzbl %%al, %%eax\n");
+      break;
+    case TAC_LT:
+      fprintf(output, "\tcmpl %%eax, %%edx\n"
+                      "\tsetl %%al\n"
+                      "\tmovzbl %%al, %%eax\n");
+      break;
+    case TAC_GE:
+      fprintf(output, "\tcmpl %%eax, %%edx\n"
+                      "\tsetge %%al\n"
+                      "\tmovzbl %%al, %%eax\n");
+      break;
+    case TAC_LE:
+      fprintf(output, "\tcmpl %%eax, %%edx\n"
+                      "\tsetle %%al\n"
+                      "\tmovzbl %%al, %%eax\n");
+      break;
+    case TAC_EQ:
+      fprintf(output, "\tcmpl %%eax, %%edx\n"
+                      "\tsete %%al\n"
+                      "\tmovzbl %%al, %%eax\n");
+      break;
+    case TAC_NEQ:
+      fprintf(output, "\tcmpl %%eax, %%edx\n"
+                      "\tsetne %%al\n"
+                      "\tmovzbl %%al, %%eax\n");
+      break;
   }
 }
 
@@ -289,6 +327,18 @@ void createBinopNum(int op, char* num, FILE *output){
       break;
     case TAC_MUL:
       fprintf(output, "\timul $%s, %%eax\n", num);
+      break;
+    case TAC_GT:
+      fprintf(output, "\tmovl $%s, %%eax\n"
+                      "\tcmpl %%eax, %%edx\n"
+                      "\tsetg %%al\n"
+                      "\tmovzbl %%al, %%eax\n", num);
+      break;
+    case TAC_LT:
+      fprintf(output, "\tmovl $%s, %%eax\n"
+                      "\tcmpl %%eax, %%edx\n"
+                      "\tsetl %%al\n"
+                      "\tmovzbl %%al, %%eax\n", num);
       break;
   }
 }
@@ -371,4 +421,9 @@ void createDIV(TAC* tac, FILE* output){
 
   free(num1);
   free(num2);
+}
+
+void createIFZ(TAC* tac, FILE* output){
+  fprintf(output, "\ttest %%eax, %%eax\n"
+                  "\tje %s\n", tac->result->text);
 }

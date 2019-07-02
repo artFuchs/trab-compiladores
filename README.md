@@ -92,9 +92,12 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
    - [ ] TAC_BYTEA_DECL
    - [ ] TAC_INTA_DECL
    - [ ] TAC_FLOATA_DECL
+   - [ ] TAC CALL
    - [X] TAC_BEGINFUN
    - [X] TAC_ENDFUN
+   - [ ] TAC_ARGWRITE
    - [X] TAC_RETURN
+   - [ ] TAC_READ
    - [X] TAC_PRINT
       - linux
         - [X] caso para literais string
@@ -120,8 +123,11 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
     - [ ] TAC_AND
     - [ ] TAC_OR
     - [ ] TAC_NOT
-    - [ ] TAC_LT
-    - [ ] TAC_GT
-    - [ ] TAC_LE
-    - [ ] TAC_EQ
-    - [ ] TAC_NEQ
+    - [X] TAC_LT
+    - [X] TAC_GT
+    - [X] TAC_LE
+    - [X] TAC_EQ
+    - [X] TAC_NEQ
+    - [ ] TAC_IFZ  -- funcionando mais ou menos
+    - [ ] TAC_JUMP
+    - [ ] TAC_LABEL

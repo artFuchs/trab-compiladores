@@ -339,7 +339,7 @@ NODE *labelCreate(char *labelText){
     text = labelText;
   else{
     text = (char*) calloc (29,sizeof(char));
-    sprintf(text,"#label%d",labelnum);
+    sprintf(text,".LABEL%d",labelnum);
     labelnum++;
   }
   return hashInsert(SYMBOL_VAR,0,text);
