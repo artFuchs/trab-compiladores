@@ -146,6 +146,7 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_DIV: createDIV(tac,output); break;
     case TAC_IFZ: createIFZ(tac, output); break;
     case TAC_LABEL: fprintf(output, "%s:\n", tac->result->text); break;
+    case TAC_JUMP: fprintf(output, "\tjmp %s\n", tac->result->text); break;
 
     default:  break;
   }

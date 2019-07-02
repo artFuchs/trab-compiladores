@@ -128,6 +128,6 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
     - [X] TAC_LE
     - [X] TAC_EQ
     - [X] TAC_NEQ
-    - [ ] TAC_IFZ  -- funcionando mais ou menos
-    - [ ] TAC_JUMP
-    - [ ] TAC_LABEL
+    - [X] TAC_IFZ
+    - [X] TAC_JUMP
+    - [X] TAC_LABEL
