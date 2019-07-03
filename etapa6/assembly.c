@@ -9,9 +9,11 @@
 void addMacMain();
 void declareStrings(FILE *output);
 void fixIntVarNames();
-char* leapNumToInt(char *num);
+char* leapNumToDecNum(char *num);
 int createAssembly(TAC *tac, FILE *output);
 void createVARDECL(TAC *tac, FILE *output);
+void createARRAYDECL(TAC *tac, FILE *output);
+void createINITARRAY(TAC *tac, FILE *output, int type);
 void createBEGFUN(TAC *tac, FILE *output);
 void createENDFUN(TAC *tac, FILE *output);
 void createRETURN(TAC *tac, FILE *output);
@@ -58,6 +60,11 @@ void declareStrings(FILE *output){
           "LCINT:\n"
           "\t.string \"%%d\"\n");
 
+  fprintf(output,
+          "\t.text\n"
+          "LCFLOAT:\n"
+          "\t.string \"%%f\"\n");
+
   for (i=0; i<HASH_SIZE; i++){
     if (Table[i]){
       NODE* node = Table[i];
@@ -100,7 +107,7 @@ void fixIntVarNames(){
   }
 }
 
-char* leapNumToInt(char *num){
+char* leapNumToDecNum(char *num){
   int len = strlen(num);
   if (len==0) return 0;
   char* buffer = (char*) calloc (len,sizeof(char));
@@ -117,6 +124,7 @@ char* leapNumToInt(char *num){
       case 'C': buffer[i] = '7'; break;
       case 'B': buffer[i] = '8'; break;
       case 'A': buffer[i] = '9'; break;
+      case '.': buffer[i] = '.'; break;
       default: buffer[i] = 0;
     }
   }
@@ -125,11 +133,18 @@ char* leapNumToInt(char *num){
 
 int createAssembly(TAC *tac, FILE *output){
   if (!tac) return 0;
-
+  static int last_array_type = 0;
   switch (tac->instruction){
     case TAC_BYTE_DECL:
     case TAC_INT_DECL:
     case TAC_FLOAT_DECL: createVARDECL(tac, output); break;
+    case TAC_INTA_DECL:
+    case TAC_BYTEA_DECL:
+    case TAC_FLOATA_DECL:
+      createARRAYDECL(tac, output);
+      last_array_type = tac->instruction;
+      break;
+    case TAC_ARRAY_INIT: createINITARRAY(tac, output, last_array_type); break;
     case TAC_BEGINFUN: createBEGFUN(tac, output); break;
     case TAC_RETURN: createRETURN(tac, output); break;
     case TAC_ENDFUN: createENDFUN(tac, output); break;
@@ -168,8 +183,16 @@ void createVARDECL(TAC *tac, FILE *output){
   varName = tac->result->text;
   sprintf (zeros,".zero %d", size);
   if (tac->op1){
-    char *num = leapNumToInt(tac->op1->text);
-    sprintf (val, ".long %s", num);
+    char *num = leapNumToDecNum(tac->op1->text);
+    switch (tac->instruction){
+      case TAC_INT_DECL:
+      case TAC_BYTE_DECL:
+        sprintf (val, ".long %s", num);
+        break;
+      case TAC_FLOAT_DECL:
+        sprintf (val, ".float %s", num);
+        break;
+    }
     free(num);
   }
   fprintf(output,
@@ -179,6 +202,36 @@ void createVARDECL(TAC *tac, FILE *output){
           "%s:\n"
           "\t%s\n",
           varName, varName, tac->op1?val:zeros);
+}
+
+void createARRAYDECL(TAC *tac, FILE *output){
+  char* varName = tac->result->text;
+  fprintf(output,
+          "\t.data\n"
+          "\t.globl %s\n"
+          "%s:\n",
+          varName, varName);
+  if (tac->next->instruction == TAC_ARRAY_INIT) return;
+  char* num = leapNumToDecNum(tac->op1->text);
+  int arraySize = strtol(num,NULL,10);
+  free(num);
+  int i;
+  for (i=0;i<arraySize;i++)
+    fprintf(output, "\t.long 0\n");
+}
+
+void createINITARRAY(TAC* tac, FILE *output, int type){
+  char* num = leapNumToDecNum(tac->op1->text);
+  switch (type){
+    case TAC_BYTEA_DECL:
+    case TAC_INTA_DECL:
+      fprintf(output, "\t.long %s\n", num);
+      break;
+    case TAC_FLOAT_DECL:
+      fprintf(output, "\t.float %s\n", num);
+      break;
+  }
+  free(num);
 }
 
 void createBEGFUN(TAC *tac, FILE *output){
@@ -203,7 +256,7 @@ void createRETURN(TAC *tac, FILE *output){
   switch (tac->result->type){
       case SYMBOL_LIT_INT:
       case SYMBOL_LIT_BYTE:
-        num = leapNumToInt(tac->result->text);
+        num = leapNumToDecNum(tac->result->text);
         fprintf(output,
                 "movl	$%s, %%eax \n",
                 num);
@@ -228,13 +281,11 @@ void createPRINT(TAC *tac, FILE *output){
               tac->result->text);
       break;
     case SYMBOL_LIT_INT:
-    case SYMBOL_LIT_FLOAT:
     case SYMBOL_LIT_BYTE:
-      num = leapNumToInt(tac->result->text);
+      num = leapNumToDecNum(tac->result->text);
       fprintf(output,
               STR_PRINT_NUM,
               num);
-      free(num);
       break;
     case SYMBOL_VAR:
       if (strstr(tac->result->text,"__tempvar")){
@@ -250,6 +301,7 @@ void createPRINT(TAC *tac, FILE *output){
       }
       break;
   }
+  free(num);
 }
 
 void createMOVE(TAC *tac, FILE *output){
@@ -257,7 +309,7 @@ void createMOVE(TAC *tac, FILE *output){
   switch (tac->op1->type){
     case SYMBOL_LIT_INT:
     case SYMBOL_LIT_BYTE:
-      num = leapNumToInt(tac->op1->text);
+      num = leapNumToDecNum(tac->op1->text);
       fprintf(output,"\tmovl $%s, %s(%%rip)\n", num, tac->result->text);
       free(num);
       break;
@@ -396,7 +448,7 @@ void createBinop(int op, TAC *tac, FILE *output){
     switch(tac->op2->type){
       case SYMBOL_LIT_BYTE:
       case SYMBOL_LIT_INT:
-        num = leapNumToInt(tac->op2->text);
+        num = leapNumToDecNum(tac->op2->text);
         if (!strstr(tac->op1->text, "__tempvar"))
           fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
         createBinopNum(op, num, output);
@@ -408,7 +460,7 @@ void createBinop(int op, TAC *tac, FILE *output){
     switch(tac->op1->type){
       case SYMBOL_LIT_BYTE:
       case SYMBOL_LIT_INT:
-        num = leapNumToInt(tac->op1->text);
+        num = leapNumToDecNum(tac->op1->text);
         if (!strstr(tac->op2->text, "__tempvar"))
           fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op2->text);
         createBinopNum(op, num, output);
@@ -418,12 +470,12 @@ void createBinop(int op, TAC *tac, FILE *output){
       char *num1 = NULL;
       char *num2 = NULL;
       if (tac->op1->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE)
-        num1 = leapNumToInt(tac->op1->text);
+        num1 = leapNumToDecNum(tac->op1->text);
       else
         return;
 
       if (tac->op2->type == SYMBOL_LIT_INT || tac->op2->type == SYMBOL_LIT_BYTE)
-        num2 = leapNumToInt(tac->op2->text);
+        num2 = leapNumToDecNum(tac->op2->text);
       else{
         free(num1);
         return;
@@ -446,14 +498,14 @@ void createDIV(TAC* tac, FILE* output){
   if (fvar && !strstr(tac->op1->text, "__tempvar")){
     fprintf(output, "\tmovl %s(%%rip), %%eax\n", tac->op1->text);
   }else if (tac->op1->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE){
-    num1 = leapNumToInt(tac->op1->text);
+    num1 = leapNumToDecNum(tac->op1->text);
     fprintf(output, "\tmovl $%s, %%eax\n", num1);
   }
 
   if (svar){
     fprintf(output, "\tmovl %s(%%rip), %%esi\n", tac->op2->text);
   }else if (tac->op2->type == SYMBOL_LIT_INT || tac->op2->type == SYMBOL_LIT_BYTE){
-    num2 = leapNumToInt(tac->op2->text);
+    num2 = leapNumToDecNum(tac->op2->text);
     fprintf(output, "\tmovl $%s, %%esi\n", num2);
   }
 

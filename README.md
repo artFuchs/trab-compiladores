@@ -88,10 +88,10 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
 - [ ] fazer a geração de assembly para cada TAC, em linux e MAC;
    - [X] TAC_INT_DECL
    - [X] TAC_BYTE_DECL
-   - [ ] TAC_FLOAT_DECL
-   - [ ] TAC_BYTEA_DECL
-   - [ ] TAC_INTA_DECL
-   - [ ] TAC_FLOATA_DECL
+   - [X] TAC_FLOAT_DECL
+   - [X] TAC_BYTEA_DECL
+   - [X] TAC_INTA_DECL
+   - [X] TAC_FLOATA_DECL
    - [X] TAC_MOVE
    - [ ] TAC_ARRAYW
    - [ ] TAC_ARRAYR
@@ -115,9 +115,7 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
    - [X] TAC_JUMP
    - [X] TAC_LABEL
    - [X] TAC_RETURN
-   - [ ] TAC_READ
-      - [X] linux
-      - [ ] mac
+   - [X] TAC_READ
    - [X] TAC_PRINT
       - linux
         - [X] caso para literais string
