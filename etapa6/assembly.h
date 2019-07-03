@@ -65,10 +65,15 @@ int tacToAssembly(TAC *tac, FILE* output);
 					  "\tmovl -8(%%rbp), %%edi          ## 4-byte Reload\n"\
 					  "\tmovl %%eax, -12(%%rbp)         ## 4-byte Spill\n"
 
-#define STR_READ "\tleaq %s(%%rip), %%rsi\n"\
-            "\tleaq LCINT(%%rip), %%rdi\n"\
-            "\tmovl $0, %%eax\n"\
-            "\tcall __isoc99_scanf\n"
+#define STR_READ "\tleaq LCINT(%%rip), %%rdi\n"\
+				 "\tmovq %s@GOTPCREL(%%rip), %%rsi\n"\
+				 "\txorl %%eax, %%eax\n"\
+				 "\tmovb %%al, %%cl\n"\
+				 "\tmovl %%eax, -8(%%rbp)          ## 4-byte Spill\n"\
+				 "\tmovb %%cl, %%al\n"\
+				 "\tcallq _scanf\n"\
+				 "\tmovl -8(%%rbp), %%edi          ## 4-byte Reload\n"\
+				 "\tmovl %%eax, -12(%%rbp)         ## 4-byte Spill\n"
 #endif
 
 
