@@ -19,6 +19,7 @@ void createENDFUN(TAC *tac, FILE *output);
 void createRETURN(TAC *tac, FILE *output);
 void createPRINT(TAC *tac, FILE *output);
 void createMOVE(TAC *tac, FILE *output);
+void createARRAYW(TAC *tac, FILE *output);
 void createBinop(int op, TAC *tac, FILE *output);
 void createDIV(TAC* tac, FILE* output);
 void createIFZ(TAC* tac, FILE* output);
@@ -150,6 +151,7 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_ENDFUN: createENDFUN(tac, output); break;
     case TAC_PRINT: createPRINT(tac, output); break;
     case TAC_MOVE: createMOVE(tac, output); break;
+    case TAC_ARRAYW: createARRAYW(tac, output); break;
     case TAC_ADD:
     case TAC_SUB:
     case TAC_MUL:
@@ -328,6 +330,41 @@ void createMOVE(TAC *tac, FILE *output){
       }
       break;
   }
+}
+
+void createARRAYW(TAC *tac, FILE *output){
+  char *pos=0;
+  char *arg=0;
+
+  switch (tac->op2->type){
+    case SYMBOL_LIT_INT:
+      pos = leapNumToDecNum(tac->op2->text);
+      int size = strlen(pos) + 1;
+      arg = (char*) calloc (size,sizeof(char));
+      sprintf(arg,"$%s",pos);
+      free(pos);
+      break;
+    case SYMBOL_VAR:
+      arg = tac->op2->text;
+  }
+
+  switch (tac->op1->type){
+    case SYMBOL_LIT_INT:
+      pos = leapNumToDecNum(tac->op1->text);
+      fprintf(output, "\tmovl %s, %%eax\n"
+                      "\tmovl %%eax, %s+%s(%%rip)\n",
+                      arg, pos, tac->result->text);
+      break;
+    case SYMBOL_VAR:
+      fprintf(output, "\tmovl %s(%%rip), %%eax\n"
+                      "\tcltq\n"
+                      "\tleaq 0(,%%rax,4), %%rdx\n"
+                      "\tleaq %s(%%rip), %%rax\n"
+                      "\tmovl %s, (%%rdx,%%rax)\n",
+                      tac->op1->text, tac->result->text, arg);
+  }
+  free(arg);
+  free(pos);
 }
 
 void createBinopVar(int op, FILE *output){
