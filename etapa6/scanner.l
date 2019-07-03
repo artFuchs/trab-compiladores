@@ -91,4 +91,6 @@ void initMe(){
   lineNumber = 1;
   running = 1;
   hashInit();
+  functions_asts = NULL;
+  functions_asts_size = 0;
 }
