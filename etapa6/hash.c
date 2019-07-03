@@ -15,6 +15,8 @@ void hashInit(){
   for (i=0; i<HASH_SIZE; i++){
     Table[i] = NULL;
   }
+  functions_asts = NULL;
+  functions_asts_size = 0;
 }
 
 int hashAddress(char* text){

@@ -7,6 +7,8 @@
 #include "ast.h"
 #include <stdio.h>
 
+void addFunction(AST* func);
+
 AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST* son4, int lineNumber){
   AST* newNode = 0;
   newNode = (AST*) calloc (1,sizeof(AST));
@@ -17,6 +19,8 @@ AST* newSyntaxNode (int type, NODE* symbol, AST* son1, AST* son2, AST* son3, AST
   newNode->sons[2] = son3;
   newNode->sons[3] = son4;
   newNode->lineNumber = lineNumber;
+  if (type == AST_FUNC_DECL)
+    addFunction(newNode);
   return newNode;
 }
 
@@ -292,4 +296,17 @@ void decompile (AST* node, FILE* output){
       break;
     default: return;
   }
+}
+
+void addFunction(AST* func){
+  AST** functions = (AST**) calloc(functions_asts_size+1,sizeof(AST*));
+  int i;
+  for (i=0;i<functions_asts_size;i++){
+    functions[i] = functions_asts[i];
+  }
+  functions[i]=func;
+  free(functions_asts);
+  functions_asts = functions;
+  functions_asts_size++;
+  return;
 }

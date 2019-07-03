@@ -21,6 +21,8 @@ typedef struct syntax_node{
 } AST;
 
 AST* global_ast;
+AST** functions_asts;
+int functions_asts_size;
 
 AST* newSyntaxNode (int type, struct node* symbol, AST* son1, AST* son2, AST* son3, AST* son4, int lineNumber);
 void printNode (AST* node, int depth);

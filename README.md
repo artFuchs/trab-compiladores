@@ -92,13 +92,31 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
    - [ ] TAC_BYTEA_DECL
    - [ ] TAC_INTA_DECL
    - [ ] TAC_FLOATA_DECL
-   - [ ] TAC CALL
+   - [X] TAC_MOVE
+   - [ ] TAC_ARRAYW
+   - [ ] TAC_ARRAYR
+   - [X] TAC_ADD
+   - [X] TAC_SUB
+   - [X] TAC_MUL
+   - [X] TAC_DIV
+   - [ ] TAC_AND
+   - [ ] TAC_OR
+   - [ ] TAC_NOT
+   - [X] TAC_LT
+   - [X] TAC_GT
+   - [X] TAC_LE
+   - [X] TAC_EQ
+   - [X] TAC_NEQ
+   - [X] TAC CALL
    - [X] TAC_BEGINFUN
    - [X] TAC_ENDFUN
-   - [ ] TAC_ARGWRITE
-   - [X] TAC_RETURN
+   - [X] TAC_ARGWRITE
+   - [X] TAC_IFZ
+   - [X] TAC_JUMP
+   - [X] TAC_LABEL
    - [ ] TAC_READ
    - [X] TAC_PRINT
+   - [X] TAC_RETURN
       - linux
         - [X] caso para literais string
         - [X] caso para variaveis
@@ -108,26 +126,8 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
         - [ ] caso para literais char
       - mac
         - [X] caso para literais string
-        - [ ] caso para variaveis
+        - [X] caso para variaveis
         - [ ] caso para expressões aritméticas - tem que arrumar a TAC
-        - [ ] caso para literais inteiros e byte
+        - [X] caso para literais inteiros e byte
         - [ ] caso para literais float
         - [ ] caso para literais char
-    - [X] TAC_MOVE
-    - [ ] TAC_ARRAYW
-    - [ ] TAC_ARRAYR
-    - [X] TAC_ADD
-    - [X] TAC_SUB
-    - [X] TAC_MUL
-    - [X] TAC_DIV
-    - [ ] TAC_AND
-    - [ ] TAC_OR
-    - [ ] TAC_NOT
-    - [X] TAC_LT
-    - [X] TAC_GT
-    - [X] TAC_LE
-    - [X] TAC_EQ
-    - [X] TAC_NEQ
-    - [X] TAC_IFZ
-    - [X] TAC_JUMP
-    - [X] TAC_LABEL

@@ -20,6 +20,7 @@ void createMOVE(TAC *tac, FILE *output);
 void createBinop(int op, TAC *tac, FILE *output);
 void createDIV(TAC* tac, FILE* output);
 void createIFZ(TAC* tac, FILE* output);
+void createCALL(TAC* tac, FILE* output);
 
 int tacToAssembly(TAC* tac, FILE* output){
   if (!tac) return 1;
@@ -147,6 +148,8 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_IFZ: createIFZ(tac, output); break;
     case TAC_LABEL: fprintf(output, "%s:\n", tac->result->text); break;
     case TAC_JUMP: fprintf(output, "\tjmp %s\n", tac->result->text); break;
+    case TAC_CALL: createCALL(tac,output); break;
+    case TAC_ARGWRITE: createMOVE(tac,output); break;
 
     default:  break;
   }
@@ -462,4 +465,8 @@ void createDIV(TAC* tac, FILE* output){
 void createIFZ(TAC* tac, FILE* output){
   fprintf(output, "\ttest %%eax, %%eax\n"
                   "\tje %s\n", tac->result->text);
+}
+
+void createCALL(TAC* tac, FILE* output){
+  fprintf(output, "\tcall %s\n", tac->op1->text);
 }
