@@ -12,7 +12,7 @@ byte main ()
   {
   a = C;
   v[a] = AO;
-  print v[a];
+  print v[a], "\n";
 
   print "Digite um numero: \n";
   read a;
