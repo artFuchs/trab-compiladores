@@ -27,6 +27,11 @@ int tacToAssembly(TAC *tac, FILE* output);
                       "\tmovl $0, %%eax\n"\
                       "\tcall printf@PLT\n"
 
+#define STR_READ "\tleaq %s(%%rip), %%rsi\n"\
+                 "\tleaq LCINT(%%rip), %%rdi\n"\
+                 "\tmovl $0, %%eax\n"\
+                 "\tcall __isoc99_scanf@PLT\n"
+
 #else
 // in this case the target must be __APPLE__
 
@@ -59,6 +64,11 @@ int tacToAssembly(TAC *tac, FILE* output);
 					  "\tcallq _printf\n"\
 					  "\tmovl -8(%%rbp), %%edi          ## 4-byte Reload\n"\
 					  "\tmovl %%eax, -12(%%rbp)         ## 4-byte Spill\n"
+
+#define STR_READ "\tleaq %s(%%rip), %%rsi\n"\
+            "\tleaq LCINT(%%rip), %%rdi\n"\
+            "\tmovl $0, %%eax\n"\
+            "\tcall __isoc99_scanf\n"
 #endif
 
 

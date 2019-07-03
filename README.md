@@ -114,9 +114,11 @@ A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
    - [X] TAC_IFZ
    - [X] TAC_JUMP
    - [X] TAC_LABEL
-   - [ ] TAC_READ
-   - [X] TAC_PRINT
    - [X] TAC_RETURN
+   - [ ] TAC_READ
+      - [X] linux
+      - [ ] mac
+   - [X] TAC_PRINT
       - linux
         - [X] caso para literais string
         - [X] caso para variaveis

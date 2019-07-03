@@ -21,6 +21,7 @@ void createBinop(int op, TAC *tac, FILE *output);
 void createDIV(TAC* tac, FILE* output);
 void createIFZ(TAC* tac, FILE* output);
 void createCALL(TAC* tac, FILE* output);
+void createREAD(TAC* tac, FILE *output);
 
 int tacToAssembly(TAC* tac, FILE* output){
   if (!tac) return 1;
@@ -150,6 +151,7 @@ int createAssembly(TAC *tac, FILE *output){
     case TAC_JUMP: fprintf(output, "\tjmp %s\n", tac->result->text); break;
     case TAC_CALL: createCALL(tac,output); break;
     case TAC_ARGWRITE: createMOVE(tac,output); break;
+    case TAC_READ: createREAD(tac,output);
 
     default:  break;
   }
@@ -469,4 +471,12 @@ void createIFZ(TAC* tac, FILE* output){
 
 void createCALL(TAC* tac, FILE* output){
   fprintf(output, "\tcall %s\n", tac->op1->text);
+}
+
+void createREAD(TAC* tac, FILE *output){
+  if (!tac) return;
+  if (tac->result->type != SYMBOL_VAR) return;
+  if (strstr(tac->result->text, "__tempvar")) return;
+
+  fprintf(output, STR_READ, tac->result->text);
 }
