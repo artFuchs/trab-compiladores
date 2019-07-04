@@ -1,6 +1,5 @@
 int a = O;
 int b = O;
-int c = O;
 
 int sum (int x, int y){
   return x + y;
@@ -13,6 +12,6 @@ int mult (int f, int g){
 int main (){
   a = sum (I, H);
   b = mult (G, H);
-  c = mult (G, H, I);
-  c = sum ();
+  print "a: ", a, "\n";
+  print "b: ", b, "\n";
 };

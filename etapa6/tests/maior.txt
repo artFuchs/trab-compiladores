@@ -11,16 +11,16 @@ int main () {
     loop (i<IO) {
         read tmp;
         v[i] = tmp;
-        i = i + 1;
+        i = i + I;
     };
     m = maior ();
-    print "O maior número é: ", m;
-    return O;   
+    print "O maior número é: ", m, "\n";
+    return O;
 };
 
 int maior (){
     loop (i < IO){
-        if (m < v[i]) then m = v[i];
+        if (tmp < v[i]) then tmp = v[i];
     };
-    return O;
+    return tmp;
 };

@@ -335,39 +335,47 @@ void createMOVE(TAC *tac, FILE *output){
 }
 
 void createARRAYW(TAC *tac, FILE *output){
-  char *pos=0;
-  char *arg=0;
+  //op1 = array index
+  //op2 = data to write
 
-  switch (tac->op2->type){
-    case SYMBOL_LIT_INT:
-      pos = leapNumToDecNum(tac->op2->text);
-      int size = strlen(pos) + 1;
-      arg = (char*) calloc (size,sizeof(char));
-      sprintf(arg,"$%s",pos);
-      free(pos);
-      pos=0;
-      break;
-    case SYMBOL_VAR:
-      arg = tac->op2->text;
-  }
+  int fstvar = tac->op1->type == SYMBOL_VAR;
+  int sndvar = tac->op2->type == SYMBOL_VAR;
+  int fstint = tac->op1->type == SYMBOL_LIT_INT || tac->op1->type == SYMBOL_LIT_BYTE;
+  int sndint = tac->op2->type == SYMBOL_LIT_INT || tac->op2->type == SYMBOL_LIT_BYTE;
+  if (fstvar && sndvar ){
+    fprintf(output,"\tmovl	%s(%%rip), %%eax\n"
+  	               "\tmovl	%s(%%rip), %%edx\n"
+  	               "\tcltq\n"
+  	               "\tleaq	0(,%%rax,4), %%rcx\n"
+  	               "\tleaq	%s(%%rip), %%rax\n"
+  	               "\tmovl	%%edx, (%%rcx,%%rax)\n",
+                  tac->op1->text, tac->op2->text, tac->result->text);
 
-  switch (tac->op1->type){
-    case SYMBOL_LIT_INT:
-      pos = leapNumToDecNum(tac->op1->text);
-      fprintf(output, "\tmovl %s, %%eax\n"
-                      "\tmovl %%eax, %s+%s(%%rip)\n",
-                      arg, pos, tac->result->text);
-      break;
-    case SYMBOL_VAR:
-      fprintf(output, "\tmovl %s(%%rip), %%eax\n"
-                      "\tcltq\n"
-                      "\tleaq 0(,%%rax,4), %%rdx\n"
-                      "\tleaq %s(%%rip), %%rax\n"
-                      "\tmovl %s, (%%rdx,%%rax)\n",
-                      tac->op1->text, tac->result->text, arg);
+  }else if (fstvar && sndint){
+    char *num = leapNumToDecNum(tac->op2->text);
+    fprintf(output, "\tmovl %s(%%rip), %%eax\n"
+                    "\tcltq\n"
+                    "\tleaq 0(,%%rax,4), %%rdx\n"
+                    "\tleaq %s(%%rip), %%rax\n"
+                    "\tmovl $%s, (%%rdx,%%rax)\n",
+                    tac->op1->text, tac->result->text, num);
+    free(num);
+  }else if (fstint && sndvar){
+    char *pos = leapNumToDecNum(tac->op1->text);
+    int position = 4 * strtol(pos,NULL,10);
+    fprintf(output, "\tmovl	%s(%%rip), %%eax\n"
+  	                "\tmovl	%%eax, %d+a(%%rip)\n",
+                   tac->op2->text, position);
+    free(pos);
+  }else if (fstint && sndint){
+    char *pos = leapNumToDecNum(tac->op1->text);
+    int position = 4 * strtol(pos,NULL,10);
+    char *data = leapNumToDecNum(tac->op2->text);
+    fprintf(output, "\tmovl	$%s, %d+a(%%rip)\n",
+                  data, position);
+    free(pos);
+    free(data);
   }
-  free(arg);
-  free(pos);
 }
 
 void createARRAYR(TAC *tac, FILE *output){
