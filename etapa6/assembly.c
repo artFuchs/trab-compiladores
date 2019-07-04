@@ -345,6 +345,7 @@ void createARRAYW(TAC *tac, FILE *output){
       arg = (char*) calloc (size,sizeof(char));
       sprintf(arg,"$%s",pos);
       free(pos);
+      pos=0;
       break;
     case SYMBOL_VAR:
       arg = tac->op2->text;
