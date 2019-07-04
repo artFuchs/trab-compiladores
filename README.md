@@ -73,7 +73,7 @@ uma para variáveis temporárias e outra para *labels*. Elas serão usadas na
 geração de código para guardar sub-resultados de cada operação e para marcar os
 pontos de desvio no fluxo de execução;
 
-- [ ] Geração de código - faça uma rotina que percorre a AST recursivamente,
+- [X] Geração de código - faça uma rotina que percorre a AST recursivamente,
 retornando um trecho de código intermediário (lista de TACs) para cada nodo
 visitado. Essa rotina primeiro processa os nodos filhos, armazena os trechos de
 código gerados para cada um deles, depois testa o nodo atual e gera o código
@@ -81,3 +81,53 @@ correspondente para este nodo. A geração em geral consiste na criação de uma
 mais novas instruções (TACs), união dos trechos das sub-árvores e dessas novas
 instruções, opcionalmente com a criação de novos símbolos intermediários e
 labels, retornando um trecho de código completo desse novo nodo;
+
+## Etapa 6
+A etapa 6 consiste na geração de código assembly AT&T a partir das TACs.
+- [X] gerar arquivo de saída;
+- [ ] fazer a geração de assembly para cada TAC, em linux e MAC;
+   - [X] TAC_INT_DECL
+   - [X] TAC_BYTE_DECL
+   - [X] TAC_FLOAT_DECL
+   - [X] TAC_BYTEA_DECL
+   - [X] TAC_INTA_DECL
+   - [X] TAC_FLOATA_DECL
+   - [X] TAC_MOVE
+   - [X] TAC_ARRAYW
+   - [X] TAC_ARRAYR
+   - [X] TAC_ADD
+   - [X] TAC_SUB
+   - [X] TAC_MUL
+   - [X] TAC_DIV
+   - [ ] TAC_AND
+   - [ ] TAC_OR
+   - [ ] TAC_NOT
+   - [X] TAC_LT
+   - [X] TAC_GT
+   - [X] TAC_LE
+   - [X] TAC_EQ
+   - [X] TAC_NEQ
+   - [X] TAC CALL
+   - [X] TAC_BEGINFUN
+   - [X] TAC_ENDFUN
+   - [X] TAC_ARGWRITE
+   - [X] TAC_IFZ
+   - [X] TAC_JUMP
+   - [X] TAC_LABEL
+   - [X] TAC_RETURN
+   - [X] TAC_READ
+   - [X] TAC_PRINT
+      - linux
+        - [X] caso para literais string
+        - [X] caso para variaveis
+        - [ ] caso para expressões aritméticas - tem que arrumar a TAC
+        - [X] caso para literais inteiros e byte
+        - [ ] caso para literais float
+        - [ ] caso para literais char
+      - mac
+        - [X] caso para literais string
+        - [X] caso para variaveis
+        - [ ] caso para expressões aritméticas - tem que arrumar a TAC
+        - [X] caso para literais inteiros e byte
+        - [ ] caso para literais float
+        - [ ] caso para literais char

@@ -2,6 +2,7 @@
 #include "symbols.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 TAC* genSymbolTac(AST* ast, TAC **code);
 TAC* genVarDeclTac(AST *ast, TAC **code);
@@ -12,7 +13,7 @@ TAC* genBinopTac(int inst, TAC **code);
 TAC* genMoveTac(AST* ast, TAC **code);
 TAC* genArrayWriteTac(AST *ast, TAC **code);
 TAC* genFuncCallTac(AST *ast, TAC **code);
-TAC* genFuncCallArgTac(AST *ast, TAC **code);
+TAC* genFuncCallArgTac(AST *ast, AST *func);
 TAC* genIfTac(TAC **code);
 TAC* genIfElseTac(TAC **code);
 TAC* genLoopTac(TAC **code);
@@ -137,7 +138,7 @@ TAC* genTac(AST *ast){
     case AST_ASSIGN: result = genMoveTac(ast, code); break;
     case AST_ARRAY_ASSIGN: result = genArrayWriteTac(ast, code); break;
     case AST_FUNC_CALL: result = genFuncCallTac(ast,code); break;
-    case AST_ARG_LIST: result = genFuncCallArgTac(ast,code); break;
+    //case AST_ARG_LIST: result = genFuncCallArgTac(ast,code); break;
     case AST_IF: result = genIfTac(code); break;
     case AST_IF_ELSE: result = genIfElseTac(code); break;
     case AST_LOOP: result = genLoopTac(code); break;
@@ -235,23 +236,36 @@ TAC* genFuncCallTac(AST *ast, TAC **code){
   char label[80];
   sprintf(label,"%s",ast->symbol->text);
   NODE* labelNode = labelCreate(label);
+
+  TAC* args = 0;
+  if (ast->sons[0]){
+    // find the right function AST
+    AST* func = 0;
+    int i;
+    for (i=0; i<functions_asts_size; i++){
+      if (strcmp(functions_asts[i]->symbol->text,ast->symbol->text)==0){
+        func = functions_asts[i];
+        break;
+      }
+    }
+    args = genFuncCallArgTac(ast->sons[0], func);
+  }
+
   TAC* fun = tacCreate(TAC_CALL,tempCreate(),labelNode, 0);
-  TAC* args = NULL;
   AST* aux = ast->sons[0];
-  return tacJoin(code[0],fun);
+  return tacJoin(code[0],
+                  tacJoin(args, fun));
 }
 
-TAC* genFuncCallArgTac(AST *ast, TAC **code){
-  int paramN = 0;
+TAC* genFuncCallArgTac(AST *ast, AST *func){
+  if (!ast || !func) return 0;
   TAC* args = NULL;
   AST* aux = ast;
+  AST* auxF = func->sons[1];
   while (aux){
-    char numText[22];
-    sprintf(numText,"%d",paramN);
-    NODE* numNode = hashInsert(SYMBOL_LIT_INT, 0, numText);
-    args = tacJoin(args, tacCreate(TAC_ARGWRITE, aux->sons[0]->symbol?aux->sons[0]->symbol:0, numNode?numNode:0, 0));
+    args = tacJoin(tacCreate(TAC_ARGWRITE, auxF->sons[0]?auxF->sons[0]->symbol:0, aux->sons[0]->symbol?aux->sons[0]->symbol:0, 0), args);
     aux = aux->sons[1];
-    paramN++;
+    auxF = auxF->sons[1];
   }
   return args;
 }
@@ -339,7 +353,7 @@ NODE *labelCreate(char *labelText){
     text = labelText;
   else{
     text = (char*) calloc (29,sizeof(char));
-    sprintf(text,"#label%d",labelnum);
+    sprintf(text,".LABEL%d",labelnum);
     labelnum++;
   }
   return hashInsert(SYMBOL_VAR,0,text);

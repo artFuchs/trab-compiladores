@@ -1,0 +1,7 @@
+int ans = O;
+int ans1 = O;
+
+int main(){
+  ans = E + ((I * D) / H);
+  print "E + I * D / H = ", ans, "\n";
+};

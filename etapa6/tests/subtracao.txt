@@ -1,0 +1,20 @@
+ZZ programa para testar subtração
+
+int a = E;
+int b = C;
+int ans = O;
+
+byte main(){
+    print "a vale: ", a, "\n";
+    print "b vale: ", b, "\n";
+    ans = b - a;
+    print "b - a é: ", ans, "\n";
+    ans = a - b;
+    print "a - b é: ", ans, "\n";
+    ans = a - H;
+    print "a - 2 é: ", ans, "\n";
+    ans = A - a;
+    print "9 - a é: ", ans, "\n";
+    print "retornando 9 \n";
+    return A;
+};
